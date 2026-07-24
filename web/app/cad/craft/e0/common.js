@@ -3,6 +3,10 @@ import {PRIMITIVE_TYPES} from "engine/data/primitiveData";
 export const DEFLECTION = 2;
 export const E0_TOLERANCE = 1e-3;
 
+export function getDeflection() {
+  return DEFLECTION;
+}
+
 export function singleShellRespone(oldShell, newShellData) {
   if (newShellData.error) {
     throw 'operation failed';

@@ -2,6 +2,7 @@ import Vector, {AXIS, ORIGIN} from 'math/vector';
 import {RiCamera2Line} from "react-icons/ri";
 import {ViewMode} from "cad/scene/viewer";
 import {GiCube, HiCube, HiOutlineCube} from "react-icons/all";
+import {Box3, Vector3} from 'three';
 
 const NEG_X = AXIS.X.negate();
 const NEG_Y = AXIS.Y.negate();
@@ -13,6 +14,54 @@ export function lookAtFace(viewer, face, currFace) {
   const dist = currFace ? currFace.csys.origin.distanceTo(viewer.sceneSetup.camera.position) : undefined;
   viewer.lookAt(face.csys.origin, face.csys.z, face.csys.y, dist);
   viewer.requestRender();
+}
+
+export function fitFaceToOrthoCamera(viewer, face) {
+  const csys = face.csys;
+  viewer.lookAt(csys.origin, csys.z, csys.y);
+  viewer.requestRender();
+}
+
+export function animateSketchEntry(viewer, face, fromCamPos, fromCamTarget, fromCamUp) {
+  const sceneSetup = viewer.sceneSetup;
+  const camera = sceneSetup.camera;
+  const toCamPos = camera.position.clone();
+  const toTarget = sceneSetup.trackballControls.target.clone();
+  const toUp = camera.up.clone();
+
+  const duration = 400;
+  const startTime = performance.now();
+
+  function step() {
+    const elapsed = performance.now() - startTime;
+    const t = Math.min(elapsed / duration, 1);
+    const ease = 1 - Math.pow(1 - t, 3);
+
+    camera.position.lerpVectors(fromCamPos, toCamPos, ease);
+    sceneSetup.trackballControls.target.lerpVectors(fromCamTarget, toTarget, ease);
+    if (fromCamUp) camera.up.lerpVectors(fromCamUp, toUp, ease).normalize();
+    viewer.requestRender();
+
+    if (t < 1) {
+      requestAnimationFrame(step);
+    }
+  }
+  requestAnimationFrame(step);
+}
+
+export function fitSceneToCamera(viewer, workGroup, faceNormal, faceUp) {
+  const box = new Box3();
+  box.setFromObject(workGroup);
+  const size = box.getSize(new Vector3());
+  const center = box.getCenter(new Vector3());
+  const maxDim = Math.max(size.x, size.y, size.z, 1);
+  const dist = maxDim * 2.5;
+
+  viewer.lookAt(center, faceNormal, faceUp, dist);
+}
+
+export function fitSceneToCameraAnimated(viewer, workGroup, faceNormal, faceUp) {
+  fitSceneToCamera(viewer, workGroup, faceNormal, faceUp);
 }
 
 function faceAt(shells, shell, pos) {
