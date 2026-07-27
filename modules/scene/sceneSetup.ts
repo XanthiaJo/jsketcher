@@ -8,6 +8,7 @@ import {
   Color,
   DirectionalLight,
   Euler,
+  GridHelper,
   Matrix4,
   Object3D,
   OrthographicCamera,
@@ -30,6 +31,7 @@ export default class SceneSetUp {
   camera: Camera;
   light: DirectionalLight;
   renderer: WebGLRenderer;
+  originGrid: GridHelper;
   private _prevContainerWidth: number;
   private _prevContainerHeight: number;
   trackballControls: CADTrackballControls;
@@ -92,12 +94,27 @@ export default class SceneSetUp {
     this.scene.add(this.light);
 
     this.scene.add( new AmbientLight( 0xffffff, 0.25 ) );
+    this.addOriginGrid();
 
     this.renderer = new WebGLRenderer();
     this.renderer.setPixelRatio(DPR);
     this.updateClearColor();
     this.renderer.setSize( this.container.clientWidth,  this.container.clientHeight );
     this.container.appendChild( this.renderer.domElement );
+  }
+
+  addOriginGrid() {
+    this.originGrid = new GridHelper(1600, 64, 0x4f7f9f, 0x59636f);
+    this.originGrid.renderOrder = -2;
+
+    const materials = Array.isArray(this.originGrid.material) ? this.originGrid.material : [this.originGrid.material];
+    materials.forEach(material => {
+      material.transparent = true;
+      material.opacity = 0.24;
+      material.depthWrite = false;
+    });
+
+    this.scene.add(this.originGrid);
   }
 
   updateClearColor() {
