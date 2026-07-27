@@ -1,5 +1,7 @@
 # Welcome to the JSketcher workbench developer guide!
 
+For current fork structure, UI/theme wiring, validation commands, and maintainer conventions, see [Maintainer Notes](./maintainer-notes.md).
+
 This guide will describe how to create work bench commands and dialogs used as steps in the part history. JSketcher provides a standard way to define new part history commands that create both the new feature geometry and track the user input fields for a particular command. Input fields are standard user interface elements providing text boxes, numeric inputs and drop downs in addition to rich intelligent geometry selection widgets for sketches, edges, faces, ect.
 
 JSketcher provides a structured mechanism for tracking part history operations and their related inputs. This history can be though of a short program. Each step in the series can generate new geometry and build off of references to the previous steps. Tracking IDs of geometry such as edges, faces and bodies is handled automatically and UI widgets are provided for the selection of these entities from feature command dialogs.
@@ -421,5 +423,106 @@ export default {
   - Every datum has an X, Y and Z axis
 - EntityKind.LOOP
   - A loop is a 3D curve.
+
+# Theming
+
+JSketcher uses a CSS custom property (CSS variable) based theming system that allows runtime switching between dark and light themes without recompiling. The theme is controlled by a CSS class on the `<body>` element.
+
+## How it works
+
+All theme colors are defined as CSS custom properties in `modules/ui/styles/theme.less`. The `:root` selector defines the default dark theme values. The LESS variables (`@bg-color-1`, `@font-color`, etc.) reference these CSS variables, so the compiled CSS emits `var(--bg-color-1)` which can be overridden at runtime.
+
+A light theme override lives in `modules/ui/styles/theme-light.less` and is applied when `body` has the `theme-light` class. Both theme files are bundled via `modules/ui/styles/global/index.less`.
+
+## Theme variables
+
+The following CSS custom properties control the appearance:
+
+| Variable | Purpose |
+|---|---|
+| `--hue-prim` | Base hue for the grayscale ramp |
+| `--saturation` | Saturation for the grayscale ramp |
+| `--bg-color-0` through `--bg-color-9` | 10-step lightness ramp (0=darkest, 9=lightest) |
+| `--bg-base-color` | Main app background (defaults to `--bg-color-1`) |
+| `--font-color` | Primary text color |
+| `--font-color-minor` | Secondary text color |
+| `--font-color-suppressed` | Suppressed/inactive text |
+| `--font-color-disabled` | Disabled text |
+| `--border-color` | Border/divider color |
+| `--control-color-number` | Numeric input accent |
+| `--control-color-text` | Text input accent |
+| `--control-bg` | Input control background |
+| `--work-area-color` | 3D viewport canvas background |
+| `--work-area-control-bar-bg-color` | Bottom control bar background |
+| `--work-area-control-bar-bg-color-active` | Bottom control bar hover/active |
+| `--color-danger` | Danger button color |
+| `--color-danger-light` | Danger button active state |
+| `--color-accent` | Accent button color |
+| `--color-accent-dark` | Accent button active state |
+| `--color-neutral` | Neutral button color |
+| `--color-neutral-dark` | Neutral button active state |
+| `--color-highlight` | Highlight/selection color |
+| `--color-highlight-dark` | Highlight active state |
+| `--color-btn-selected` | Selected button background |
+| `--on-color-highlight` | Overlay highlight color |
+| `--on-color-highlight-variant-*` | Per-color highlight variants (yellow, pink, red, green, blue) |
+
+## Creating a new theme
+
+1. Create a new file `modules/ui/styles/theme-mytheme.less`
+2. Define overrides under a body class selector:
+
+```less
+body.theme-mytheme {
+  --hue-prim: 210;
+  --saturation: 20%;
+  --bg-color-0: hsl(var(--hue-prim), var(--saturation), 10%);
+  --bg-color-1: hsl(var(--hue-prim), var(--saturation), 15%);
+  // ...override any variables you want to change
+  --work-area-color: #f0f0f0;
+  --font-color: hsl(0, 0, 20%);
+}
+```
+
+3. Import it in `modules/ui/styles/global/index.less`:
+```less
+@import "../theme-mytheme.less";
+```
+
+4. Toggle the body class from code:
+```js
+document.body.classList.toggle('theme-mytheme');
+if (services.viewer) {
+  services.viewer.updateClearColor(); // updates 3D canvas background
+}
+```
+
+You only need to override the variables that differ from the default dark theme. Any variable not overridden will inherit from `:root`.
+
+## The 3D canvas background
+
+The 3D viewport background is controlled by `--work-area-color`. Unlike the UI panels (which update automatically via CSS), the three.js renderer clear color must be updated in JavaScript. The `SceneSetUp.updateClearColor()` method in `modules/scene/sceneSetup.ts` reads the computed value of `--work-area-color` from `document.body` and applies it to the WebGLRenderer. Call `viewer.updateClearColor()` after any theme change.
+
+## Theme toggle action
+
+The `ToggleTheme` action in `web/app/cad/actions/coreActions.js` toggles the `theme-light` class on `body`, persists the choice to `localStorage` under the key `jsketcher.theme`, and calls `viewer.updateClearColor()`. On app load, `web/app/cad/dom/components/WebApplication.jsx` restores the theme from `localStorage`.
+
+The toggle button appears in the bottom control bar (right side) and is registered in `web/app/cad/workbench/uiConfigBundle.js`.
+
+## Using theme values in JavaScript
+
+The `modules/ui/styles/theme.ts` module exports a proxy object that reads CSS variables at runtime via `getComputedStyle`. This is useful when you need a color value in JavaScript (e.g. for React icon colors):
+
+```ts
+import theme from "ui/styles/theme";
+
+<GrCubes color={theme.onColorHighlightVariantYellow} />
+```
+
+The proxy resolves the property name to the corresponding CSS variable name (e.g. `onColorHighlightVariantYellow` → `--on-color-highlight-variant-yellow`) and reads the current computed value. This means it automatically reflects the active theme.
+
+## LESS mixins and color functions
+
+LESS color functions like `darken()` and `lighten()` cannot operate on `var(...)` strings because they run at compile time. Instead of using these functions, define explicit dark/light variant variables (e.g. `--color-accent` and `--color-accent-dark`) and pass both to the `.button-behavior(@color; @colorDark)` mixin defined in `modules/ui/styles/mixins.less`.
 
 # More documentation to come
