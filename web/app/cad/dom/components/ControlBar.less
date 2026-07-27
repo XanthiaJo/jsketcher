@@ -3,7 +3,7 @@
 .root {
   display: flex;
   justify-content: space-between;
-  background-color: @work-area-control-bar-bg-color;
+  background-color: @toolbar-bg;
   color: @work-area-control-bar-font-color;
   white-space: nowrap;
 }
@@ -27,7 +27,7 @@
   flex-direction: row-reverse;
 }
 
-@border: 1px solid @border-color;
+@border: 0.5px solid @border-color;
 .left .button {
   border-right: @border;
   display: flex;
@@ -41,6 +41,6 @@
 .button.disabled {
   color: @font-color-suppressed;
   &:hover {
-    background-color: @work-area-control-bar-bg-color;
+    background-color: @toolbar-bg;
   }
 }

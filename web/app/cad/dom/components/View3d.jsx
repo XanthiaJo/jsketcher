@@ -38,8 +38,8 @@ export default class View3d extends React.Component {
             <HeadsUpToolbar/>
             <HeadsUpHelper/>
           </div>
-          <ViewCube />
           <div className={ls.middleSection + ' small-typography'}>
+            <ViewCube />
             <SketcherMode whenOff={
               <div className={ls.overlayingPanel} >
                 <SceneInlineObjectExplorer />
