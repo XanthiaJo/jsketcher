@@ -143,6 +143,27 @@ export default [
   },
 
   {
+    id: 'ToggleTheme',
+    appearance: {
+      cssIcons: ['sun-o'],
+      label: 'theme',
+      info: 'toggle between dark and light theme',
+    },
+    invoke: ({services}) => {
+      document.body.classList.toggle('theme-light');
+      try {
+        localStorage.setItem('jsketcher.theme', document.body.classList.contains('theme-light') ? 'light' : 'dark');
+      } catch(e) {
+        // Theme still changes for the session if storage is unavailable.
+      }
+
+      if (services.viewer) {
+        services.viewer.updateClearColor();
+      }
+    }
+  },
+
+  {
     id: 'Info',
     appearance: {
       cssIcons: ['info-circle'],

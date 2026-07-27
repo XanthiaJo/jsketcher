@@ -28,6 +28,10 @@ export default class Viewer {
   requestRender = () => {
     this.sceneSetup.requestRender();
   };
+
+  updateClearColor() {
+    this.sceneSetup.updateClearColor();
+  }
   
   setVisualProp = (obj, prop, value) => {
     if (obj[prop] !== value) {
