@@ -8,6 +8,7 @@ import {SketchMesh} from "cad/scene/views/shellView";
 import {FACE} from "cad/model/entities";
 import {setAttribute} from "scene/objectData";
 import {ViewMode} from "cad/scene/viewer";
+import {createPlaneGrid} from "cad/scene/views/planeGridView";
 
 export class SketchingView extends View {
   
@@ -59,7 +60,50 @@ export class SketchingView extends View {
 
   dispose() {
     this.disposeSketch();
+    this.dropPlaneGrid();
     super.dispose();
+  }
+
+  mark(type = 'selection') {
+    super.mark(type);
+    if (type === 'highlight') {
+      this.showPlaneGrid();
+    }
+  }
+
+  withdraw(type) {
+    super.withdraw(type);
+    if (type === 'highlight') {
+      this.hidePlaneGrid();
+    }
+  }
+
+  showPlaneGrid() {
+    if (!this.model.isPlaneBased) {
+      return;
+    }
+    if (!this.planeGrid) {
+      this.planeGrid = createPlaneGrid(this.model.csys);
+      this.rootGroup.add(this.planeGrid);
+    }
+    this.planeGrid.visible = true;
+    this.ctx.viewer.requestRender();
+  }
+
+  hidePlaneGrid() {
+    if (this.planeGrid) {
+      this.planeGrid.visible = false;
+      this.ctx.viewer.requestRender();
+    }
+  }
+
+  dropPlaneGrid() {
+    if (!this.planeGrid) {
+      return;
+    }
+    this.rootGroup.remove(this.planeGrid);
+    this.planeGrid.dispose();
+    this.planeGrid = null;
   }
 
 }

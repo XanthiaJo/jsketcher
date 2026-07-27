@@ -1,0 +1,101 @@
+@import "~ui/styles/theme.less";
+
+@cube-size: 72px;
+@cube-half: 36px;
+
+.root {
+  position: absolute;
+  top: 78px;
+  right: 18px;
+  width: 118px;
+  height: 118px;
+  pointer-events: auto;
+  z-index: 3;
+  color: @font-color;
+  user-select: none;
+}
+
+.scene {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 420px;
+  perspective-origin: 50% 50%;
+}
+
+.cube {
+  position: relative;
+  width: @cube-size;
+  height: @cube-size;
+  transform-style: preserve-3d;
+  transition: transform 110ms linear;
+}
+
+.face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid @border-color;
+  background: @bg-color-4;
+  color: @font-color;
+  box-shadow: inset 0 0 0 1px @bg-color-6;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  cursor: pointer;
+  backface-visibility: hidden;
+
+  &:hover {
+    background: @toolbar-button-hover-bg;
+    color: @toolbar-button-hover-color;
+    border-color: @toolbar-button-hover-color;
+  }
+}
+
+.front {
+  transform: translateZ(@cube-half);
+}
+
+.back {
+  transform: rotateY(180deg) translateZ(@cube-half);
+}
+
+.right {
+  transform: rotateY(90deg) translateZ(@cube-half);
+}
+
+.left {
+  transform: rotateY(-90deg) translateZ(@cube-half);
+}
+
+.top {
+  transform: rotateX(90deg) translateZ(@cube-half);
+}
+
+.bottom {
+  transform: rotateX(-90deg) translateZ(@cube-half);
+}
+
+.corner {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  width: 18px;
+  height: 18px;
+  border: 1px solid @border-color;
+  border-radius: 50%;
+  background: @bg-color-4;
+  cursor: pointer;
+  z-index: 2;
+
+  &:hover {
+    background: @toolbar-button-hover-bg;
+    border-color: @toolbar-button-hover-color;
+  }
+}

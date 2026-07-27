@@ -1,12 +1,10 @@
 import React from 'react';
-import PlugableControlBar from './PlugableControlBar';
 import ls from './View3d.less';
 import UISystem from './UISystem';
 import WizardManager from '../../craft/wizard/components/WizardManager';
 import FloatView from './FloatView';
-import HistoryTimeline from '../../craft/ui/HistoryTimeline';
 import SelectedModificationInfo from '../../craft/ui/SelectedModificationInfo';
-import CameraControl from './CameraControl';
+import ViewCube from './ViewCube';
 import HeadsUpHelper from './HeadsUpHelper';
 import {HeadsUpToolbar} from './HeadsUpToolbar';
 import {SketchObjectExplorer} from '../../../sketcher/components/SketchObjectExplorer';
@@ -40,7 +38,7 @@ export default class View3d extends React.Component {
             <HeadsUpToolbar/>
             <HeadsUpHelper/>
           </div>
-
+          <ViewCube />
           <div className={ls.middleSection + ' small-typography'}>
             <SketcherMode whenOff={
               <div className={ls.overlayingPanel} >
@@ -67,13 +65,6 @@ export default class View3d extends React.Component {
               <ContributedComponents/>
             </div>
           </div>
-
-          <div className={ls.bottomStack}>
-            <CameraControl />
-            <HistoryTimeline />
-            <PlugableControlBar/>
-          </div>
-          
         </div>
       </div>
       <SelectedModificationInfo />
