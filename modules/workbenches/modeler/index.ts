@@ -28,7 +28,50 @@ import {GetInfo} from "./actions/getInfo/getInfo.action";
 import {ExportBREP} from "./actions/exportBREP/exportBREP.action";
 //import workbench icon
 import {GiCubes} from "react-icons/gi";
+import React from "react";
+import {
+  ArrowUpFromLine,
+  Box,
+  Circle,
+  CircleFadingPlus,
+  CircleSlash2,
+  Cone,
+  Cuboid,
+  Cylinder,
+  Drill,
+  Eraser,
+  Expand,
+  FileSearch,
+  FileUp,
+  FlipHorizontal,
+  Grid3x3,
+  Import,
+  Layers,
+  Move,
+  Move3d,
+  PanelRight,
+  PanelTop,
+  PencilRuler,
+  RotateCw,
+  Rotate3d,
+  ScanEye,
+  Shell,
+  Spline,
+  Square,
+  SquareDashed,
+  SquareDashedTopSolid,
+  SquareRoundCorner,
+  SquaresIntersect,
+  SquaresSubtract,
+  SquaresUnite,
+  Trash2,
+  Waypoints
+} from "lucide-react";
+import {getSizeInPx} from "cad/icons/DeclarativeIcon";
 
+const ribbonIcon = (Icon) => ({
+  icon: ({size}) => React.createElement(Icon, {size: getSizeInPx(size), strokeWidth: 1.8})
+});
 
 export const ModelerWorkspace: WorkbenchConfig = {
 
@@ -65,21 +108,63 @@ export const ModelerWorkspace: WorkbenchConfig = {
   ],
   ui: {
     toolbar: [
-      'DATUM_CREATE', 'PLANE', 'EditFace', '-',
+      ['StandardViewFront', ribbonIcon(Square)],
+      ['StandardViewTop', ribbonIcon(PanelTop)],
+      ['StandardViewRight', ribbonIcon(PanelRight)],
+      ['StandardView3Way', ribbonIcon(Box)],
+      '-',
+      ['ViewMode_WIREFRAME_ON', ribbonIcon(Cuboid)],
+      ['ViewMode_SHADED_ON', ribbonIcon(Box)],
+      ['ViewMode_SHADED_WITH_EDGES_ON', ribbonIcon(Layers)],
+      '-',
+      ['LookAtFace', ribbonIcon(ScanEye)],
+      '-',
+      ['DATUM_CREATE', ribbonIcon(Move3d)],
+      ['PLANE', ribbonIcon(SquareDashedTopSolid)],
+      ['EditFace', ribbonIcon(PencilRuler)],
+      '-',
 
-      "EXTRUDE", "CUT", "REVOLVE", "LOFT", "SWEEP", "-",
+      ["EXTRUDE", ribbonIcon(ArrowUpFromLine)],
+      ["CUT", ribbonIcon(SquareDashed)],
+      ["REVOLVE", ribbonIcon(Rotate3d)],
+      ["LOFT", ribbonIcon(Layers)],
+      ["SWEEP", ribbonIcon(Spline)],
+      "-",
 
-      "BOOLEAN", "UNION", "SUBTRACT", "INTERSECT", "-",
+      ["BOOLEAN", ribbonIcon(CircleFadingPlus)],
+      ["UNION", ribbonIcon(SquaresUnite)],
+      ["SUBTRACT", ribbonIcon(SquaresSubtract)],
+      ["INTERSECT", ribbonIcon(SquaresIntersect)],
+      "-",
 
-      "SHELL_TOOL", "FILLET_TOOL", "SCALE_BODY", "DEFEATURE_REMOVE_FACE", "-",
+      ["SHELL_TOOL", ribbonIcon(Shell)],
+      ["FILLET_TOOL", ribbonIcon(SquareRoundCorner)],
+      ["SCALE_BODY", ribbonIcon(Expand)],
+      ["DEFEATURE_REMOVE_FACE", ribbonIcon(Eraser)],
+      "-",
 
-      "MIRROR_BODY", "PATTERN_LINEAR", "PATTERN_RADIAL", "MOVE_BODY" ,"-",
+      ["MIRROR_BODY", ribbonIcon(FlipHorizontal)],
+      ["PATTERN_LINEAR", ribbonIcon(Grid3x3)],
+      ["PATTERN_RADIAL", ribbonIcon(RotateCw)],
+      ["MOVE_BODY", ribbonIcon(Move)],
+      "-",
 
-      "CYLINDER", "BOX", "CONE", "SPHERE", "TORUS", "-",
+      ["CYLINDER", ribbonIcon(Cylinder)],
+      ["BOX", ribbonIcon(Cuboid)],
+      ["CONE", ribbonIcon(Cone)],
+      ["SPHERE", ribbonIcon(Circle)],
+      ["TORUS", ribbonIcon(CircleSlash2)],
+      "-",
 
-      "HOLE_TOOL", "-", 'GET_INFO', "IMPORT_MODEL", "DELETE_BODY", "-",
+      ["HOLE_TOOL", ribbonIcon(Drill)],
+      "-",
+      ['GET_INFO', ribbonIcon(FileSearch)],
+      ["IMPORT_MODEL", ribbonIcon(Import)],
+      ["DELETE_BODY", ribbonIcon(Trash2)],
+      "-",
       
-      "WIRE_LINE", 'EXPORT_BREP',
+      ["WIRE_LINE", ribbonIcon(Waypoints)],
+      ['EXPORT_BREP', ribbonIcon(FileUp)],
     ]
   },
   icon: GiCubes

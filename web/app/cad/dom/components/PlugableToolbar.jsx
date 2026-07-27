@@ -23,7 +23,9 @@ export function ToolbarActionButtons({actions, showTitles, size}) {
       return <ToolbarSplitter key={'ToolbarSplitter' + i} />;
     } else if (actionRef === '|') {
       return <ToolbarBraker key={'ToolbarBraker' + i} />;
-    } else if (Array.isArray(actionRef)) {
+    }
+    const isOverrideRef = Array.isArray(actionRef) && typeof actionRef[0] === 'string' && actionRef.length === 2 && !Array.isArray(actionRef[1]);
+    if (!isOverrideRef && Array.isArray(actionRef)) {
       return <div key={'ToolbarGroup' + i}>
         <ToolbarGroup><ToolbarActionButtons actions={actionRef.slice(0, actionRef.length / 2)} showTitles={showTitles} size={size} /></ToolbarGroup>
         <ToolbarGroup><ToolbarActionButtons actions={actionRef.slice(actionRef.length / 2, actionRef.length)} showTitles={showTitles} size={size} /></ToolbarGroup>

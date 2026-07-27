@@ -8,8 +8,14 @@ import Expressions from '../expressions/Expressions';
 import {SelectionView} from "../dom/components/SelectionView";
 import {GrSelect} from "react-icons/gr";
 import {Explorer} from "cad/dom/components/Explorer";
+import {Download, Save, SunMoon} from "lucide-react";
+import {getSizeInPx} from "cad/icons/DeclarativeIcon";
 
 export const BundleName = "@UIConfig";
+
+const ribbonIcon = Icon => ({
+  icon: ({size}) => <Icon size={getSizeInPx(size)} strokeWidth={1.8}/>
+});
 
 export function activate(ctx) {
   const {services, streams} = ctx;
@@ -17,10 +23,17 @@ export function activate(ctx) {
   streams.ui.controlBars.right.value = [
     ['Info', {label: null}],
     ['RefreshSketches', {label: null}],
-    ['ShowSketches', {label: 'sketches'}], ['DeselectAll', {label: null}], ['ToggleCameraMode', {label: null}]
+    ['ShowSketches', {label: 'sketches'}],
+    ['DeselectAll', {label: null}],
+    ['ToggleCameraMode', {label: null}]
   ];
 
-  streams.ui.toolbars.headsUpQuickActions.value = ['Save', 'StlExport', 'menu.workbenches'];
+  streams.ui.toolbars.headsUpQuickActions.value = [
+    ['Save', {label: null, ...ribbonIcon(Save)}],
+    ['StlExport', {label: null, ...ribbonIcon(Download)}],
+    ['ToggleTheme', {label: null, ...ribbonIcon(SunMoon)}],
+    'menu.workbenches'
+  ];
   
   ctx.actionService.registerActions(CoreActions);
   ctx.actionService.registerActions(HistoryActions);

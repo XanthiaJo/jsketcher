@@ -12,7 +12,10 @@ export const HeadsUpToolbar = connect(streams => combine(
   function HeadsUpToolbar({actions, showTitles, quickActions}) {
     return <Toolbar flat>
       <div className={ls.quickButtons}>
-        {quickActions.map(actionId => <ConnectedActionButton size='small' key={actionId} actionId={actionId} />)}
+        {quickActions.map(actionRef => {
+          const [actionId, overrides] = Array.isArray(actionRef) ? actionRef : [actionRef, {}];
+          return <ConnectedActionButton key={actionId} actionId={actionId} size='small' noLabel={true} {...overrides} />;
+        })}
       </div>
       <div className={ls.mainActions}>
         <ToolbarActionButtons actions={actions} showTitles={showTitles}/>

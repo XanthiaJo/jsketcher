@@ -12,7 +12,8 @@
     "check-code": "./node_modules/typescript/bin/tsc --noEmit",
     "checks-passed-banner": "echo 'All conditions passed. Ready to go to the main branch. Good job!'",
     "before-main-branch-merge": "npm run lint && npm run check-code && npm run checks-passed-banner",
-    "cypress": "npx cypress open"
+    "cypress": "npx cypress open",
+    "test:theme": "node test/theme.test.js"
   },
   "repository": {
     "type": "git",
@@ -86,6 +87,7 @@
     "less": "^3.11.1",
     "libtess": "1.2.2",
     "lodash": "^4.17.15",
+    "lucide-react": "^1.27.0",
     "marked": "^4.0.18",
     "mousetrap": "1.6.1",
     "numeric": "1.2.6",
