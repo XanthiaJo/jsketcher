@@ -2,15 +2,30 @@
 
 This file is a practical map for working on this fork. It records where the main systems live, how recent UI/theme changes are wired, and the conventions that are easy to miss when moving around the codebase.
 
+For a full top-down architecture overview (subsystems, data flow, how everything interlinks), see [architecture.md](./architecture.md). For code style baselines (formatting, naming, functions, classes, streams, operations, actions, views), see [code-style.md](./code-style.md). For the workbench/feature author guide, see [index.md](./index.md).
+
 ## Runtime Shape
 
 JSketcher is a browser-only CAD app. There is no application server in normal use.
 
 - `web/app/index.js` starts the full CAD app.
-- `web/app/sketcher.js` starts the standalone 2D sketcher.
-- `webpack.config.js` builds both entry points into `dist/static`.
+- `web/index.html` is the CAD app entry page.
+- The old standalone `web/sketcher.html` 2D page has been removed from this fork.
+- `webpack.config.js` builds the `index` entry into `dist/static/index.bundle.js`.
 - `web/` is also served as static content by webpack-dev-server.
 - OpenCascade functionality is provided through `jsketcher-occ-engine` and browser-loaded wasm assets.
+- Local development runs on `http://localhost:3001`.
+- Production is static output from `dist/`; use a static site/document root in CloudPanel, not a Node app.
+
+## Shared Structured Chaos Shell
+
+The public pages use the shared Structured Chaos chrome.
+
+- `web/index.html` and `web/changelog.html` load `css/shared.css`, `global-bar.js`, and `site-header.js` from StructuredChaos.
+- The loader uses `http://localhost:4000` in local development and `https://misssponto.me.uk` in production.
+- `web/css/site-shell.css` must stay layout-only for JSketcher app/content sizing. Do not restyle the global bar, title header, nav, project links, or collapse tab there.
+- `web/js/shared-shell-fallback.js` only renders matching shared-class fallback markup when the shared scripts fail to load.
+- If static output is edited manually, mirror shell changes into the matching files under `dist/`.
 
 ## Application Startup
 
@@ -29,6 +44,20 @@ When adding a new cross-cutting service, follow the bundle pattern:
 3. Activate it in `startApplication.js` in the right phase.
 4. Keep UI-only registration out of domain services.
 
+## Default Project Seeding
+
+New or empty projects start with construction geometry at the origin, mirroring Fusion 360 and most other CAD tools: an origin datum and the three base planes (XY, XZ, ZY).
+
+- `web/app/cad/projectBundle.ts` — `DEFAULT_PROJECT_HISTORY` is the seed history (a single `DATUM_CREATE` at origin). `load()` seeds this history via `loadData()` when no saved project data is found in storage.
+- `web/app/cad/craft/datum/create/createDatumOperation.js` — the `DATUM_CREATE` operation checks if the datum is at the origin (x=0, y=0, z=0, no rotations, no face). If so, it marks the datum with `originatingOperation = -1` (sentinel: not from history) and creates the three base planes as `MOpenFaceShell` instances with `{ width: 100, height: 100 }` bounds (smaller than the 750x750 default for user-created planes), including them in the operation result.
+- The datum and planes are part of the operation's `created` array, so they go through the normal pipeline and are added to the model set. Both have `originatingOperation = -1` and are not in the history timeline as separate items.
+- `modules/workbenches/modeler/features/deleteBody/deleteBody.operation.ts` — the delete body operation checks if the origin datum (id `D:0`) is in the selection and throws an error if so, preventing deletion.
+- Saved projects are loaded as-is — the seed only applies to projects with no stored history.
+- `empty()` (used by the import flow to wipe before loading) is intentionally not changed; it still loads a truly empty `{history: [], expressions: ''}` so imports aren't polluted with seed operations.
+- The datum and planes cannot be undone or deleted via the history timeline (they're part of the seed operation). The datum is protected from deletion; the planes can be deleted via the delete body action if needed.
+
+The `DATUM_CREATE` operation is registered by `WorkbenchesLoaderBundle` (core operations) before `projectService.load()` runs, so the seed history is always materializable at load time.
+
 ## Major Directories
 
 - `modules/brep` - BRep/topological geometry primitives and helpers.
@@ -39,7 +68,7 @@ When adding a new cross-cutting service, follow the bundle pattern:
 - `modules/workbenches` - workbench definitions and feature registrations.
 - `web/app/cad` - the main CAD application shell, services, model layer, scene views, craft/history, storage, workbench UI.
 - `web/app/sketcher` - standalone sketcher tools, constraints, shapes, and sketcher UI.
-- `web/css` - global page chrome CSS for entry pages outside CSS modules.
+- `web/css` - JSketcher page-layout CSS for entry pages outside CSS modules. Shared chrome styling comes from StructuredChaos `css/shared.css`.
 - `docs` - maintainer and feature author documentation.
 - `test` - small repo-specific Node tests.
 
@@ -94,19 +123,31 @@ Important overlays:
 - `ViewCube` - top-right orientation cube.
 - `FloatView` - floating panels such as explorer/history/expressions.
 - `WizardManager` - operation dialogs.
+- `BottomStack` - bottom-mounted history timeline and footer control bar.
 - Sketcher overlays are only active inside `SketcherMode`.
 
-The bottom camera/control bar has been removed in this fork. Do not reintroduce bottom-bar controls unless that is an explicit UI direction.
+The bottom camera widget is replaced by `ViewCube`, but the bottom history timeline and footer controls are currently mounted for feature parity while the fork layout is still being evaluated.
 
 ## Icons
 
 This fork uses simple flat ribbon icons through `lucide-react`.
 
-- Ribbon icons in the modeler workbench are configured in `modules/workbenches/modeler/index.ts`.
+- Ribbon icons in the modeler workbench are configured in `modules/workbenches/modeler/index.ts` using `ribbonIcon(id)` from `cad/workbench/modelerRibbonIcon`.
+- Ribbon icons in the sketcher workbench are configured in `web/app/cad/sketch/sketcherUIContrib.ts` using `sketcherRibbonIcon(id)` from `cad/workbench/sketcherRibbonIcon`.
 - Global quick-action icons are configured in `web/app/cad/workbench/uiConfigBundle.js`.
 - Use `getSizeInPx` from `cad/icons/DeclarativeIcon` so icon sizing follows the existing toolbar size model.
-- Use thin, readable strokes. Current ribbon helper uses `strokeWidth: 1.8`.
+- Use thin, readable strokes. Current ribbon helpers use `strokeWidth: 1.8`.
 - Keep icon choices descriptive rather than decorative.
+
+### Modeler ribbon icons
+
+`web/app/cad/workbench/modelerRibbonIcon.tsx` owns the `modelerRibbonIcons` map (action id → lucide component) and the `ribbonIcon(id)` helper that returns a `{ icon }` override for toolbar entries. Shared actions like `LookAtFace` live here so both workbenches can reference them.
+
+### Sketcher ribbon icons
+
+`web/app/cad/workbench/sketcherRibbonIcon.tsx` owns the `sketcherRibbonIcons` map (unprefixed sketcher action id → lucide component) and the `sketcherRibbonIcon(id)` helper. The sketcher toolbar in `sketcherUIContrib.ts` applies these as per-entry overrides using the same `[id, ribbonIcon(id)]` pattern as the modeler ribbon, so both ribbons use a consistent icon family.
+
+The sketcher actions themselves still carry their original custom icons in `appearance.icon` (used in the 2D sketcher tab and elsewhere). The ribbon overrides only change what the top toolbar shows.
 
 Avoid replacing the generic toolbar renderer to change an icon. Prefer action appearance or per-toolbar overrides.
 
@@ -146,6 +187,24 @@ The orientation cube is a DOM overlay, not a Three.js object.
 It listens to `sceneSetup.sceneRendered$` and derives a CSS transform from the active camera. Face clicks run existing standard view actions such as `StandardViewFront` and `StandardViewTop`.
 
 Keep the cube as a lightweight UI control. Camera math and view changes should stay in existing viewer/action services.
+
+## Camera And Orbit Controls
+
+The viewport camera is orbited by `CADTrackballControls` (a fork of the Three.js trackball controls with orthographic support). It supports two rotation modes, toggled from the bottom-right footer control bar:
+
+- **trackball** (default) — free orbit. The camera rotates around an axis perpendicular to the drag direction, so the model tumbles freely in any orientation. This is the original JSketcher behavior.
+- **turntable** — Fusion 360 style. Horizontal drag yaws the camera around the world up axis, vertical drag pitches around the camera's right axis, and the up vector is held to world up so the horizon stays level.
+
+Where the pieces live:
+
+- `modules/scene/controls/CADTrackballControls.js` — the controls themselves. `rotationMode` (`'trackball'` | `'turntable'`) selects the active rotation; `rotateCamera()` branches to `rotateCameraTurntable()` when in turntable mode. `setRotationMode(mode)` is the setter. Turntable uses a `turntableSpeedMultiplier` (default `2.5`) on top of `rotateSpeed` because split-axis yaw/pitch feels less direct than free tumble; tune that property if the drag feels too slow or too fast.
+- `web/app/cad/scene/viewer.ts` — owns the orbit mode state. `OrbitMode` enum (`TRACKBALL` | `TURNTABLE`), `orbitMode$` stream (an `externalState` mirroring the `cameraMode$` pattern), `getOrbitMode`/`setOrbitMode`/`toggleOrbitMode`/`applyOrbitMode`. The mode persists to `localStorage['jsketcher.orbitMode']` (same approach as the theme toggle) and is applied on startup in the `Viewer` constructor.
+- `web/app/cad/actions/coreActions.js` — the `ToggleOrbitMode` action. Exports `orbitModeIcon(mode)` which resolves the footer icon per mode (`Orbit` for trackball, `Disc` for turntable).
+- `web/app/cad/workbench/uiConfigBundle.js` — registers `ToggleOrbitMode` in `streams.ui.controlBars.right` (next to `ToggleCameraMode`) and attaches to `viewer.orbitMode$` to mutate the action's appearance stream so the button icon swaps live with the active mode. `attach()` fires immediately with the persisted mode, so the correct icon shows on load.
+
+The bottom-right control bar order (right group) is: `Info`, `RefreshSketches`, `ShowSketches`, `DeselectAll`, `ToggleOrbitMode`, `ToggleCameraMode`.
+
+Keep camera math in `CADTrackballControls`/`viewer` and expose switching through the action layer. Do not add orbit logic to the ViewCube or toolbar components.
 
 ## Plane Highlight Grid
 
@@ -220,3 +279,55 @@ Notes:
 - Add future architecture proposals to `DESIGN.md`.
 - Add agent-facing style rules to `AGENTS.md`.
 - Add commit scope guidance to `docs/git-scopes.md`.
+- Add roadmap items to `docs/roadmap.md`.
+
+## Roadmap Page
+
+`web/roadmap.html` is a static page that fetches `docs/roadmap.md` from the GitHub raw URL and renders it client-side with `marked.js`, matching the KnitStitch roadmap page pattern.
+
+- The markdown source lives in `docs/roadmap.md` and is the single source of truth for the public roadmap.
+- `web/js/md-page.js` handles fetching, rendering, link rewriting, TOC building, and wrapping content into `.panel` sections.
+- The page uses the same shared shell loader pattern as `web/index.html` and `web/changelog.html`.
+- The `data-md-src` attribute on `<body>` points to the `main` branch raw URL on GitHub.
+- The roadmap is linked in the `SITE_HEADER` nav on all JSketcher pages.
+
+Do not edit `web/roadmap.html` to change roadmap content — only edit it to change the page chrome. Edit `docs/roadmap.md` instead.
+
+## Changelog Page And Generation
+
+`web/changelog.html` fetches `docs/changelog.md` from the GitHub raw URL and renders it client-side with `marked.js`, using the same `md-page.js` renderer as the roadmap page.
+
+- The markdown source is generated by `scripts/generate-changelog.mjs` from fork-only commits.
+- The script uses `git cherry upstream/main HEAD` to identify commits unique to this fork (by patch ID, so it works even with rebased history).
+- Only commits not in upstream are listed. The upstream `xibyte/jsketcher` history is excluded.
+- Commits are grouped by conventional commit type (Features, Fixes, Interface, Documentation, etc.).
+- The latest version tag on HEAD is shown in the changelog snapshot line.
+- Run `npm run changelog` to regenerate `docs/changelog.md`.
+- The `data-md-src` attribute on `<body>` points to the `main` branch raw URL on GitHub.
+- The changelog is linked in the `SITE_HEADER` nav on all JSketcher pages.
+
+Do not edit `web/changelog.html` to change changelog content — run `npm run changelog` to regenerate `docs/changelog.md` instead. Only edit `web/changelog.html` to change the page chrome.
+
+## Versioning
+
+This fork versions independently from upstream, starting at `v0.1.0`.
+
+- `v0.1.0` is tagged at the first fork commit (`fd047e3e` — fix PR #219 build), the fork baseline.
+- Each subsequent fork commit bumps the version per conventional commit rules:
+  - `feat:` → minor bump (e.g. `v0.1.0` → `v0.2.0`)
+  - `fix:` → patch bump (e.g. `v0.2.0` → `v0.2.1`)
+  - `BREAKING CHANGE` or `!:` → major bump
+  - everything else (`docs:`, `ui:`, `refactor:`, `chore:`, etc.) → revision increment (4th number, e.g. `v0.2.0.1`)
+- The changelog script (`scripts/generate-changelog.mjs`) computes the current version by walking fork commits from the `v0.1.0` baseline and applying these rules.
+- `package.json` `version` tracks the computed version at HEAD.
+- Follow the Structured Chaos conventional commit rules for version bumps (see `docs/git-rules.md` in the StructuredChaos umbrella repo).
+- The old upstream-era `v1.0.0-dev.1` tag exists in history but is not part of the fork's versioning scheme.
+
+### Prerequisites
+
+The `upstream` remote must exist and be fetched for `git cherry` to work:
+
+```bash
+git remote add upstream https://github.com/xibyte/jsketcher.git  # if not already present
+git fetch upstream
+```

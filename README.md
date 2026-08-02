@@ -2,7 +2,9 @@ JSketcher
 ===========
 ![JSketcher Logo](./web/img/JSketcher-logo.svg)
 
-JSketcher is a **parametric** 2D and 3D CAD modeler written in pure javascript
+JSketcher is a **parametric** 3D CAD modeler written in pure JavaScript.
+
+This Structured Chaos fork serves the 3D CAD app at `/`. The old standalone `sketcher.html` 2D entry has been removed from this fork.
 
 
 <a href='https://www.youtube.com/watch?v=Vk3TTp8hNxQ&list=PLeoCiKHizvH8PZEyFvThHzVlnTF5XaL-R'> 
@@ -13,8 +15,6 @@ JSketcher is a **parametric** 2D and 3D CAD modeler written in pure javascript
 [YouTube Tutorial Video](https://www.youtube.com/watch?v=Vk3TTp8hNxQ&list=PLeoCiKHizvH8PZEyFvThHzVlnTF5XaL-R)
 
 [Live Sample Demo](http://web-cad.org/?com.github.jsketcher-sample-models.MODELS.Flag-Holder)
-
-[2D Sketcher](http://web-cad.org/sketcher.html#__sample2D__)
 
 [Help Docs](./web/docs/index.md)
 
@@ -32,13 +32,13 @@ Please consider supporting this project by becoming a backer
 Current Status
 ==============
 
-JSketcher is a parametric 3d modeler employing a 2D constraint solver for sketches and the feature/history metaphor to build models. The 2D constraint solver is completely written in javascript/typescript and is implemented in both the 3D CAD and the 2D sketcher. Originally developed by xibyte to make models for 3d printing. Today JSketcher provides a rich set of tools for visualizing, selecting/interacting with 3D geometry, tracking and storing model history all built on the foundation of the 2D sketcher engine and employing OpenCascade for solid modeling operations. 
+JSketcher is a parametric 3d modeler employing a 2D constraint solver for sketches and the feature/history metaphor to build models. The 2D constraint solver is completely written in javascript/typescript and is used inside the 3D CAD workflow. Originally developed by xibyte to make models for 3d printing. Today JSketcher provides a rich set of tools for visualizing, selecting/interacting with 3D geometry, tracking and storing model history all built on the foundation of the sketch constraint engine and employing OpenCascade for solid modeling operations. 
 
 Major Components and features
 ==============
 * Geometric Constraint Solver. This is a most crucial component which allows to solve a system of geometric constraints applied to a sketch. 
   See below the list of supported constraints.
-* 2D Sketcher. Allows to design 2d sketches applying geometric constraints. Uses HTML5 canvas for rendering.      
+* Sketch constraint tools for designing 2d profiles inside the 3D CAD workflow.      
 * 3D Boolean engine. OpenCascade is used to perform booleans on BREP objects.
 * Feature History. Accumulates features builds a 3d model step by step. A compare step is employed to propagate edge/face IDs forward to provide a stable and robust model. 
 * Export to **STL**, **DWG** and **SVG** formats
@@ -83,6 +83,10 @@ Install node.js
 * $ cd \<jsketcher folder\>
 * $ npm install
 * $ npm start
+
+Local development runs on `http://localhost:3001`.
+
+Production is static output from `dist/`. In CloudPanel, create a static site and point the document root at `dist`; do not create a Node app for this frontend.
 
 
 

@@ -37,6 +37,7 @@ Use these scopes with the Structured Chaos Conventional Commit rules. Scopes are
 ```text
 feat(scene): add orientation view cube
 feat(theme): restore persisted light and dark themes
+feat(scene): add turntable orbit mode and toggle action
 ui(ribbon): replace modeler toolbar icons with lucide icons
 docs(docs): add maintainer notes and git scopes
 test(theme): add theme variable coverage

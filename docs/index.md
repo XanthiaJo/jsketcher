@@ -1,6 +1,12 @@
 # Welcome to the JSketcher workbench developer guide!
 
+For a full top-down architecture overview (subsystems, data flow, how everything interlinks), see [architecture.md](./architecture.md).
+
+For code style baselines (formatting, naming, functions, classes, streams, operations, actions, views), see [code-style.md](./code-style.md).
+
 For current fork structure, UI/theme wiring, validation commands, and maintainer conventions, see [Maintainer Notes](./maintainer-notes.md).
+
+For the feature roadmap (shipped, in progress, and planned), see [Roadmap](./roadmap.md).
 
 This guide will describe how to create work bench commands and dialogs used as steps in the part history. JSketcher provides a standard way to define new part history commands that create both the new feature geometry and track the user input fields for a particular command. Input fields are standard user interface elements providing text boxes, numeric inputs and drop downs in addition to rich intelligent geometry selection widgets for sketches, edges, faces, ect.
 
