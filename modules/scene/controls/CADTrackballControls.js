@@ -35,6 +35,14 @@ export function CADTrackballControls( object, domElement ) {
   this.staticMoving = false;
   this.dynamicDampingFactor = 0.2;
 
+  // 'trackball' (default, free orbit) or 'turntable' (Fusion 360 style:
+  // yaw around world up, pitch around camera right, horizon stays level)
+  this.rotationMode = 'trackball';
+
+  // turntable splits drag into yaw/pitch around fixed axes, which feels less
+  // direct than trackball's free tumble, so boost it for a snappier response
+  this.turntableSpeedMultiplier = 2.5;
+
   this.minDistance = 0;
   this.maxDistance = Infinity;
 
@@ -164,6 +172,10 @@ export function CADTrackballControls( object, domElement ) {
 
     return function rotateCamera() {
 
+      if ( _this.rotationMode === 'turntable' ) {
+        return _this.rotateCameraTurntable();
+      }
+
       moveDirection.set( _moveCurr.x - _movePrev.x, _moveCurr.y - _movePrev.y, 0 );
       angle = moveDirection.length();
 
@@ -206,6 +218,61 @@ export function CADTrackballControls( object, domElement ) {
     };
 
   }() );
+
+  // Turntable orbit (Fusion 360 style): horizontal drag yaws the camera
+  // around the world up axis, vertical drag pitches around the camera's
+  // right axis. The horizon stays level because the up vector is held to
+  // the world up after each rotation.
+  this.rotateCameraTurntable = ( function() {
+
+    const worldUp = new THREE.Vector3( 0, 1, 0 ),
+      right = new THREE.Vector3(),
+      eyeDirection = new THREE.Vector3(),
+      qYaw = new THREE.Quaternion(),
+      qPitch = new THREE.Quaternion();
+
+    return function rotateCameraTurntable() {
+
+      const dx = _moveCurr.x - _movePrev.x;
+      const dy = _moveCurr.y - _movePrev.y;
+
+      if ( dx === 0 && dy === 0 ) {
+        _movePrev.copy( _moveCurr );
+        return;
+      }
+
+      _eye.copy( _this.object.position ).sub( _this.target );
+
+      const speed = _this.rotateSpeed * _this.turntableSpeedMultiplier;
+      const yawAngle = -dx * speed;
+      const pitchAngle = -dy * speed;
+
+      // yaw around world up
+      qYaw.setFromAxisAngle( worldUp, yawAngle );
+      _eye.applyQuaternion( qYaw );
+
+      // pitch around camera right vector (perpendicular to view dir and world up)
+      eyeDirection.copy( _eye ).normalize();
+      right.crossVectors( eyeDirection, worldUp ).normalize();
+      if ( right.lengthSq() > 0 ) {
+        qPitch.setFromAxisAngle( right, pitchAngle );
+        _eye.applyQuaternion( qPitch );
+      }
+
+      // keep the horizon level
+      _this.object.up.copy( worldUp );
+
+      _lastAngle = 0;
+
+      _movePrev.copy( _moveCurr );
+
+    };
+
+  }() );
+
+  this.setRotationMode = function( mode ) {
+    _this.rotationMode = mode;
+  };
 
 
   this.setCameraMode = function(isOrthographic) {

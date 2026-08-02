@@ -1,4 +1,4 @@
-import CoreActions from '../actions/coreActions';
+import CoreActions, {orbitModeIcon} from '../actions/coreActions';
 import HistoryActions from '../actions/historyActions';
 import UsabilityActions from '../actions/usabilityActions';
 import menuConfig from './menuConfig';
@@ -25,6 +25,7 @@ export function activate(ctx) {
     ['RefreshSketches', {label: null}],
     ['ShowSketches', {label: 'sketches'}],
     ['DeselectAll', {label: null}],
+    ['ToggleOrbitMode', {label: null}],
     ['ToggleCameraMode', {label: null}]
   ];
 
@@ -38,6 +39,19 @@ export function activate(ctx) {
   ctx.actionService.registerActions(CoreActions);
   ctx.actionService.registerActions(HistoryActions);
   ctx.actionService.registerActions(UsabilityActions);
+
+  // reflect the active orbit mode on the ToggleOrbitMode button icon;
+  // attach() fires immediately with the current (persisted) mode, then on
+  // every toggle
+  const orbitAppearance$ = streams.action.appearance['ToggleOrbitMode'];
+  if (orbitAppearance$ && services.viewer.orbitMode$) {
+    services.viewer.orbitMode$.attach(mode => {
+      orbitAppearance$.mutate(v => {
+        v.icon = orbitModeIcon(mode);
+        return v;
+      });
+    });
+  }
 
   services.menu.registerMenus(menuConfig);
 

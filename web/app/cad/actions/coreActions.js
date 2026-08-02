@@ -1,11 +1,38 @@
 import * as ActionHelpers from './actionHelpers'
-import {AiOutlineExport} from "react-icons/ai";
+import React from 'react';
+import {
+  Camera,
+  Copy,
+  Disc,
+  Download,
+  File,
+  FileImage,
+  FileJson,
+  FilePlus2,
+  GitFork,
+  Image,
+  Info,
+  MonitorDown,
+  Orbit,
+  PencilRuler,
+  RefreshCw,
+  Save,
+  Share2,
+  Square,
+  SunMoon,
+  Upload,
+} from 'lucide-react';
+import {OrbitMode} from '../scene/viewer';
+
+const footerIcon = Icon => () => <Icon size={13} strokeWidth={2} />;
+
+export const orbitModeIcon = mode => footerIcon(mode === OrbitMode.TURNTABLE ? Disc : Orbit);
 
 export default [
   {
     id: 'EditFace',
     appearance: {
-      cssIcons: ['file-picture-o'],
+      icon: footerIcon(PencilRuler),
       label: 'sketch',
       icon96: 'img/cad/face-edit96.png',
       info: 'open sketcher for a face/plane',
@@ -18,7 +45,7 @@ export default [
   {
     id: 'ReassignSketch',
     appearance: {
-      cssIcons: ['share'],
+      icon: footerIcon(Share2),
       label: 'reassign sketch',
       icon96: 'img/cad/face-edit96.png',
       info: 'open sketcher for a face/plane',
@@ -31,7 +58,7 @@ export default [
   {
     id: 'Save',
     appearance: {
-      cssIcons: ['floppy-o'],
+      icon: footerIcon(Save),
       label: 'save',
       info: 'save project to storage',
     },
@@ -41,7 +68,7 @@ export default [
   {
     id: 'StlExport',
     appearance: {
-      cssIcons: ['upload', 'flip-vertical'],
+      icon: footerIcon(Upload),
       label: 'STL Export',
       info: 'export model to STL file',
     },
@@ -51,7 +78,7 @@ export default [
   {
     id: 'ImagePngExport',
     appearance: {
-      cssIcons: ['image'],
+      icon: footerIcon(Image),
       label: 'PNG Export',
       info: 'export model as png image/render a snapshot',
     },
@@ -61,7 +88,7 @@ export default [
   {
     id: 'NativeFormatExport',
     appearance: {
-      cssIcons: ['book'],
+      icon: footerIcon(FileJson),
       label: 'Download Project',
       info: 'export model and its sketches as a json bundle',
     },
@@ -71,7 +98,7 @@ export default [
   {
     id: 'NativeFormatImport',
     appearance: {
-      cssIcons: ['download', 'flip-vertical'],
+      icon: footerIcon(Download),
       label: 'Import Project',
       info: 'empty current project and import replacing with native format json(model and its sketches)',
     },
@@ -81,7 +108,7 @@ export default [
   {
     id: 'NativeFormatImportAs',
     appearance: {
-      cssIcons: ['download', 'flip-vertical'],
+      icon: footerIcon(MonitorDown),
       label: 'Import Project as...',
       info: 'import native format json(model and its sketches) as a new project',
     },
@@ -91,7 +118,7 @@ export default [
   {
     id: 'NewProject',
     appearance: {
-      cssIcons: ['file-o'],
+      icon: footerIcon(FilePlus2),
       label: 'New Project...',
       info: 'create new project and open in a new tab',
     },
@@ -101,7 +128,7 @@ export default [
   {
     id: 'CloneCurrentProject',
     appearance: {
-      cssIcons: ['copy'],
+      icon: footerIcon(Copy),
       label: 'Clone Project...',
       info: 'clone current project and open in a new tab',
     },
@@ -111,7 +138,7 @@ export default [
   {
     id: 'RefreshSketches',
     appearance: {
-      cssIcons: ['refresh'],
+      icon: footerIcon(RefreshCw),
       label: 'Refresh Sketches',
       info: 'refresh all visible sketches',
     },
@@ -121,7 +148,7 @@ export default [
   {
     id: 'DeselectAll',
     appearance: {
-      cssIcons: ['square-o'],
+      icon: footerIcon(Square),
       label: 'deselect all',
       info: 'deselect everything',
     },
@@ -131,7 +158,7 @@ export default [
   {
     id: 'ToggleCameraMode',
     appearance: {
-      cssIcons: ['video-camera'],
+      icon: footerIcon(Camera),
       label: 'toggle camera',
       info: 'switch camera mode between perspective and orthographic',
     },
@@ -143,9 +170,23 @@ export default [
   },
 
   {
+    id: 'ToggleOrbitMode',
+    appearance: {
+      icon: orbitModeIcon(OrbitMode.TRACKBALL),
+      label: 'toggle orbit',
+      info: 'switch orbit style between trackball and turntable (Fusion 360)',
+    },
+    invoke: context => {
+      const viewer = context.services.viewer;
+      viewer.toggleOrbitMode();
+      viewer.render();
+    }
+  },
+
+  {
     id: 'ToggleTheme',
     appearance: {
-      cssIcons: ['sun-o'],
+      icon: footerIcon(SunMoon),
       label: 'theme',
       info: 'toggle between dark and light theme',
     },
@@ -166,7 +207,7 @@ export default [
   {
     id: 'Info',
     appearance: {
-      cssIcons: ['info-circle'],
+      icon: footerIcon(Info),
       label: 'info',
       info: 'opens help dialog',
     },
@@ -176,7 +217,7 @@ export default [
   {
     id: 'Donate',
     appearance: {
-      cssIcons: ['paypal'],
+      icon: footerIcon(File),
       label: 'donate',
       info: 'open paypal donate page',
     },
@@ -186,7 +227,7 @@ export default [
   {
     id: 'GitHub',
     appearance: {
-      cssIcons: ['github'],
+      icon: footerIcon(GitFork),
       label: 'GitHub',
       info: 'open GitHub project page',
     },
@@ -195,12 +236,26 @@ export default [
 
   {
     id: 'ShowSketches',
-    type: 'binary',
-    property: 'showSketches',
     appearance: {
-      cssIcons: ['image'],
+      icon: footerIcon(FileImage),
       label: 'show sketches',
       info: 'toggle whether to show sketches on a solid face'
+    },
+    invoke: context => {
+      const shells = context.services.cadRegistry.shells || [];
+      const sketchViews = [];
+      shells.forEach(shell => shell.faces.forEach(face => {
+        const sketchGroup = face.ext?.view?.sketchGroup;
+        if (sketchGroup) {
+          sketchViews.push(sketchGroup);
+        }
+      }));
+
+      const shouldShow = sketchViews.some(sketchGroup => !sketchGroup.visible);
+      sketchViews.forEach(sketchGroup => {
+        sketchGroup.visible = shouldShow;
+      });
+      context.services.viewer.requestRender();
     }
   },
   {
@@ -213,7 +268,7 @@ export default [
   {
     id: 'ExportFaceToDXF',
     appearance: {
-      icon: AiOutlineExport,
+      icon: footerIcon(Upload),
       label: 'export face DXF',
       info: 'export a selected face to a DXF file',
     },
