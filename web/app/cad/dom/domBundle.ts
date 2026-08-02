@@ -47,7 +47,7 @@ export const DomBundle: Bundle<DomBundleWorkingContext> = {
     ctx.services.dom = ctx.domService;
 
     ctx.appTabsService.tabs$.attach(({activeTab}) => {
-      if (activeTab === 0) {
+      if (activeTab === 0 && ctx.services.viewer?.sceneSetup?.renderer) {
         ctx.services.viewer.sceneSetup.updateViewportSize();
       }
     });

@@ -12,11 +12,17 @@ const MouseStates = {
 export function activate(ctx) {
   const {services, streams} = ctx;
   const domElement = services.viewer.sceneSetup.domElement();
+
+  // If WebGL is not available, don't set up mouse events
+  if (!domElement) {
+    return;
+  }
+
   const event = {
     viewer: services.viewer,
     mouseState: MouseStates.IDLE
   };
-  
+
   domElement.addEventListener('mousedown', mousedown, false);
   domElement.addEventListener('mouseup', mouseup, false);
   domElement.addEventListener('mousemove', mousemove, false);
@@ -46,15 +52,19 @@ export function activate(ctx) {
   event.startDrag = objectToDrag => {
     if (toDrag) {
       stopDrag();
-    } 
+    }
     toDrag = objectToDrag;
-    services.viewer.sceneSetup.trackballControls.enabled = false;
+    if (services.viewer.sceneSetup.trackballControls) {
+      services.viewer.sceneSetup.trackballControls.enabled = false;
+    }
   };
-  
+
   function stopDrag() {
     toDrag.dragDrop(event);
     toDrag = null;
-    services.viewer.sceneSetup.trackballControls.enabled = true;
+    if (services.viewer.sceneSetup.trackballControls) {
+      services.viewer.sceneSetup.trackballControls.enabled = true;
+    }
   }
   
   function mousedown(e) {

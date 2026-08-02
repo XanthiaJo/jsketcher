@@ -104,13 +104,52 @@ export default function startApplication(callback) {
   });
 
   startReact(context, () => {
+    // Activate DomBundle and SceneBundle first so we can check WebGL availability
+    const domBundle = bundles.find(b => b.BundleName === '@Dom');
+    if (domBundle) {
+      bundleSystem.activate(domBundle);
+    }
+
+    const sceneBundle = bundles.find(b => b.BundleName === '@Scene');
+    if (sceneBundle) {
+      bundleSystem.activate(sceneBundle);
+    }
+
+    const webGLAvailable = context.viewer && context.viewer.sceneSetup.renderer;
+
     bundles.forEach(bundle => {
+      // Skip DomBundle and SceneBundle since we already activated them
+      if (bundle.BundleName === '@Dom' || bundle.BundleName === '@Scene') return;
+
+      // Skip WebGL-dependent bundles if WebGL is not available
+      if (!webGLAvailable && isWebGLDependentBundle(bundle)) {
+        console.log('Skipping WebGL-dependent bundle:', bundle.BundleName);
+        return;
+      }
       bundleSystem.activate(bundle);
     });
     context.services.lifecycle.declareAppReady();
-    context.viewer.render();
+    if (webGLAvailable) {
+      context.viewer.render();
+    }
     callback(context);
   });
+
+  function isWebGLDependentBundle(bundle) {
+    const webGLDependentBundles = [
+      '@MouseEventSystem',
+      '@Marker',
+      '@PickControl',
+      '@EntityContext',
+      '@ViewSync',
+      '@Highlight',
+      '@Assembly',
+      '@Debug',
+      '@Preview',
+      '@UIConfig'
+    ];
+    return webGLDependentBundles.includes(bundle.BundleName);
+  }
 
   bundleSystem.checkDanglingBundles();
   bundleSystem.checkPerfectLoad();

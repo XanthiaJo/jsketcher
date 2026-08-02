@@ -41,7 +41,7 @@ export default class SceneSetUp {
   renderRequested: boolean;
 
   constructor(container) {
-    
+
     this.workingSphere = 10000;
     this.container = container;
     this.scene = new Scene();
@@ -50,9 +50,12 @@ export default class SceneSetUp {
     this.renderRequested = false;
 
     this.setUpCamerasAndLights();
-    this.setUpControls();
 
-    this.animate();
+    // Only set up controls and start animation if WebGL is available
+    if (this.renderer) {
+      this.setUpControls();
+      this.animate();
+    }
   }
 
   aspect() {
@@ -88,19 +91,96 @@ export default class SceneSetUp {
     this.createPerspectiveCamera();
 
     this.camera = this.pCamera;
-    
+
     this.light = new DirectionalLight( 0xffffff );
     this.light.position.set( 10, 10, 10 );
     this.scene.add(this.light);
 
     this.scene.add( new AmbientLight( 0xffffff, 0.25 ) );
-    this.addOriginGrid();
+    // origin grid removed — hover grid provides reference on demand
+    // this.addOriginGrid();
+
+    if (!this.checkWebGLSupport()) {
+      return;
+    }
 
     this.renderer = new WebGLRenderer();
     this.renderer.setPixelRatio(DPR);
     this.updateClearColor();
     this.renderer.setSize( this.container.clientWidth,  this.container.clientHeight );
     this.container.appendChild( this.renderer.domElement );
+  }
+
+  checkWebGLSupport(): boolean {
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+
+    if (!gl) {
+      this.showWebGLWarning();
+      return false;
+    }
+
+    const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+    if (debugInfo) {
+      const vendor = gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL);
+      const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+      console.log('WebGL renderer:', vendor, renderer);
+    }
+
+    return true;
+  }
+
+  showWebGLWarning() {
+    const warningOverlay = document.createElement('div');
+    warningOverlay.style.cssText = `
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      text-align: center;
+      z-index: 1000;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    `;
+
+    warningOverlay.innerHTML = `
+      <div style="max-width: 500px;">
+        <h2 style="margin-bottom: 1rem; color: #ff6b6b;">WebGL Not Available</h2>
+        <p style="margin-bottom: 1.5rem; line-height: 1.6;">
+          JSketcher requires WebGL to render 3D graphics. Your browser or device does not appear to support WebGL.
+        </p>
+        <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; text-align: left;">
+          <p style="margin: 0 0 0.5rem 0; font-weight: 600;">What to check:</p>
+          <ul style="margin: 0; padding-left: 1.5rem; line-height: 1.8;">
+            <li>Look for a popup in your browser's address bar (click the icon)</li>
+            <li>Enable hardware acceleration in your browser settings</li>
+            <li>Update your graphics drivers</li>
+            <li>Try a different browser (Chrome, Firefox, Edge)</li>
+          </ul>
+        </div>
+        <p style="margin-bottom: 1rem;">
+          <a href="https://get.webgl.org/" target="_blank" style="color: #4fc3f7; text-decoration: underline;">
+            Learn more about WebGL →
+          </a>
+        </p>
+        <p style="font-size: 0.85rem; opacity: 0.7;">
+          WebGL is a browser API for rendering interactive 3D graphics without plugins.
+        </p>
+      </div>
+    `;
+
+    if (this.container) {
+      this.container.appendChild(warningOverlay);
+    } else {
+      document.body.appendChild(warningOverlay);
+    }
   }
 
   addOriginGrid() {
@@ -118,6 +198,7 @@ export default class SceneSetUp {
   }
 
   updateClearColor() {
+    if (!this.renderer) return;
     const cssColor = getComputedStyle(document.body)
       .getPropertyValue('--work-area-color').trim() || '#808080';
     this.renderer.setClearColor(new Color(cssColor), 1);
@@ -125,6 +206,7 @@ export default class SceneSetUp {
   }
   
   updateViewportSize() {
+    if (!this.renderer) return;
     if (this.container.clientWidth > 0 && this.container.clientHeight > 0) {
       this.updatePerspectiveCameraViewport();
       this.updateOrthographicCameraViewport();
@@ -307,6 +389,7 @@ export default class SceneSetUp {
   }
 
   private __render_NeverCallMeFromOutside() {
+    if (!this.renderer) return;
     this.renderRequested = false;
     this.light.position.set(this.camera.position.x, this.camera.position.y, this.camera.position.z);
     this.renderer.render(this.scene, this.camera);
@@ -314,7 +397,7 @@ export default class SceneSetUp {
   }
 
   domElement() {
-    return this.renderer.domElement;   
+    return this.renderer ? this.renderer.domElement : null;
   }
 }
 

@@ -80,7 +80,8 @@ export function activate(context) {
         }
       } else {
         if (dispatchSelection(FACE, modelId, event)) {
-          services.cadScene.showGlobalCsys(model.csys);
+          // global CSys arrow removed — datum arrows provide sufficient reference
+          // services.cadScene.showGlobalCsys(model.csys);
           return false;
         }
       }

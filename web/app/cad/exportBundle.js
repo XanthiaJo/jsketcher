@@ -6,6 +6,10 @@ export const BundleName = "@Export";
 export function activate(ctx) {
 
   function toStlAsciiString() {
+    if (!ctx.services.cadRegistry) {
+      console.warn('STL export not available - cadRegistry missing');
+      return '';
+    }
     const exporter = new STLExporter();
     const views = ctx.services.cadRegistry.shells.map(mShell => mShell.ext.view).filter(m => !!m);
     return exporter.parse( views );
@@ -16,6 +20,10 @@ export function activate(ctx) {
   }
   
   function imagePng() {
+    if (!ctx.services.cadScene || !ctx.services.viewer.sceneSetup.renderer) {
+      console.warn('Image export not available - WebGL required');
+      return;
+    }
     const auxVisible = ctx.services.cadScene.auxGroup.visible;
     ctx.services.cadScene.auxGroup.visible = false;
     const renderer = ctx.services.viewer.sceneSetup.renderer;

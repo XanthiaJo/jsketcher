@@ -19,7 +19,8 @@ export default class CadScene {
     SceneGraph.addToGroup(rootGroup, this.workGroup);
     SceneGraph.addToGroup(rootGroup, this.auxGroup);
 
-    this.setUpAxises();
+    // long XYZ axes removed — datum arrows provide sufficient reference
+    // this.setUpAxises();
     this.setUpBasisGroup();
   }
 
