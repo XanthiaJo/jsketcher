@@ -17,6 +17,7 @@ import * as ExtensionsBundle from '../craft/extensionsBundle';
 import * as CadRegistryBundle from '../craft/cadRegistryBundle';
 import * as CraftBundle from '../craft/craftBundle';
 import * as RemotePartsBundle from '../partImport/remotePartsBundle';
+import * as RemoteProjectBundle from '../remoteProjectBundle';
 import * as CraftUIBundle from '../craft/craftUIBundle';
 import * as StorageBundle from '../storage/storageBundle';
 import * as ProjectBundle from '../projectBundle';
@@ -65,6 +66,7 @@ export default function startApplication(callback) {
     ExportBundle,
     ExposureBundle,
     OCCTBundle,
+    RemoteProjectBundle,
     ProjectManagerBundle
   ];
   

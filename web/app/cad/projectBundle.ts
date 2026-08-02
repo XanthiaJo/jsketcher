@@ -3,6 +3,7 @@ import {runSandbox} from './sandbox';
 import {LOG_FLAGS} from './logFlags';
 import {ApplicationContext} from "cad/context";
 import {ProjectModel} from "./projectManager/projectManagerBundle";
+import {ModelBundle} from "cad/projectManager/projectManagerBundle";
 import {DebugMode$} from "debugger/Debugger";
 import {fillUpMissingFields} from "cad/craft/schema/initializeBySchema";
 import {OperationRequest} from "./craft/craftBundle";
@@ -11,6 +12,8 @@ import {MOpenFaceShell} from "cad/model/mopenFace";
 import {PlaneSurfacePrototype} from "cad/model/surfacePrototype";
 import {Plane} from "geom/impl/plane";
 import CSys from "math/csys";
+import { resolveProjectNameConflict } from "cad/projectNamePolicy";
+import exportTextData from "gems/exportTextData";
 
 export const STORAGE_GLOBAL_PREFIX = 'TCAD';
 export const PROJECTS_PREFIX = `${STORAGE_GLOBAL_PREFIX}.projects.`;
@@ -74,6 +77,62 @@ export function initProjectService(ctx: ApplicationContext, id: string, hints: a
   }
 
   function save() {
+    const model = getCurrentProjectModel();
+    const bundle = buildModelBundle(model);
+
+    if (ctx.remoteProjectService) {
+      ctx.remoteProjectService.list().then(projects => {
+        if (!projects) {
+          handleUnauthenticatedSave(model, bundle);
+          return { skipped: true };
+        }
+        saveLocalProjectModel(model);
+        return getProjectName(projects);
+      })
+        .then(name => {
+        if (name === null || (typeof name === 'object' && name.skipped)) {
+          return null;
+        }
+        return ctx.remoteProjectService.save(id, name, bundle);
+      })
+        .then(result => {
+          if (result === null) {
+            handleUnauthenticatedSave(model, bundle);
+          }
+        })
+        .catch(error => {
+          console.error(error);
+          if (confirm('Database save failed. Save to this browser only instead? Browser storage can be cleared, blocked, or lost when changing browser/device.')) {
+            saveLocalProjectModel(model);
+          }
+        });
+      return;
+    }
+
+    handleUnauthenticatedSave(model, bundle);
+  }
+
+  function load() {
+    if (ctx.remoteProjectService) {
+      ctx.remoteProjectService.load(id)
+        .then(remoteProject => {
+          if (remoteProject) {
+            hydrateBundleToStorage(remoteProject.data);
+            loadProjectModel(remoteProject.data.model);
+          } else {
+            loadLocalProject();
+          }
+        })
+        .catch(error => {
+          console.error(error);
+          loadLocalProject();
+        });
+    } else {
+      loadLocalProject();
+    }
+  }
+
+  function getCurrentProjectModel(): ProjectModel {
     const data: ProjectModel = {
       history: ctx.craftService.modifications$.value.history,
       expressions: ctx.expressionService.script$.value,
@@ -87,38 +146,127 @@ export function initProjectService(ctx: ApplicationContext, id: string, hints: a
     if (!currentWorkbench?.internal && ctx.workbenchService.defaultWorkbenchId !== currentWorkbench.workbenchId) {
       data.workbench = currentWorkbench.workbenchId;
     }
-    ctx.storageService.set(projectStorageKey(), JSON.stringify(data));
+
+    return data;
   }
 
-  function load() {
+  function saveLocalProjectModel(model: ProjectModel) {
+    ctx.storageService.set(projectStorageKey(), JSON.stringify(model));
+  }
+
+  function handleUnauthenticatedSave(model: ProjectModel, bundle: ModelBundle) {
+    const choice = prompt(
+      'You are not signed in, so this cannot be saved to the database.\n\n' +
+      'Browser storage is local to this browser and can be lost if browser data is cleared, private/incognito mode is used, storage is blocked, or you switch device/browser.\n\n' +
+      'Type one option:\n' +
+      'account - make/sign in to an account\n' +
+      'pc - download the native file to this computer\n' +
+      'local - save only in this browser\n' +
+      'cancel - do not save',
+      'account'
+    );
+
+    switch (String(choice || 'cancel').trim().toLowerCase()) {
+      case 'account':
+        if (ctx.remoteProjectService) {
+          window.open(ctx.remoteProjectService.signInUrl(), '_blank');
+        }
+        break;
+      case 'pc':
+        downloadNativeBundle(bundle);
+        break;
+      case 'local':
+        saveLocalProjectModel(model);
+        alert('Project saved only in this browser. For safer storage, sign in or download the native file to your computer.');
+        break;
+      default:
+        break;
+    }
+  }
+
+  function downloadNativeBundle(bundle: ModelBundle) {
+    exportTextData(JSON.stringify(bundle, null, 2), safeFileName(decodeURIComponent(hints.name || id)) + '.json');
+  }
+
+  async function getProjectName(projects) {
+    if (typeof hints.name === 'string') {
+      return checkDuplicateProjectName(decodeURIComponent(hints.name), projects);
+    }
+    const prompted = prompt('Project name', 'Untitled Project') || 'Untitled Project';
+    const name = await checkDuplicateProjectName(prompted, projects);
+    hints.name = encodeURIComponent(name);
+    const separator = window.location.search ? '&' : '?';
+    window.history.replaceState(null, '', window.location.pathname + window.location.search + separator + 'name=' + hints.name);
+    return name;
+  }
+
+  async function checkDuplicateProjectName(name, projects) {
+    return resolveProjectNameConflict(projects, id, name, duplicate => {
+      const shouldRename = confirm(
+        `You already have a project named "${duplicate.name}". Save with a different name?`
+      );
+      if (!shouldRename) {
+        return name;
+      }
+      return prompt('Project name', name) || name;
+    });
+  }
+
+  function buildModelBundle(model: ProjectModel): ModelBundle {
+    const sketchKeys = ctx.storageService.getAllKeysFromNamespace(sketchStorageNamespace);
+    return {
+      model,
+      sketches: sketchKeys.map(key => ({
+        id: key.substring(sketchStorageNamespace.length),
+        data: JSON.parse(ctx.storageService.get(key))
+      }))
+    };
+  }
+
+  function hydrateBundleToStorage(bundle: ModelBundle) {
+    ctx.storageService.set(projectStorageKey(), JSON.stringify(bundle.model));
+    bundle.sketches.forEach(sketch => {
+      ctx.storageService.set(sketchStorageNamespace + sketch.id, JSON.stringify(sketch.data));
+    });
+  }
+
+  function loadLocalProject() {
     try {
       const dataStr = ctx.storageService.get(ctx.projectService.projectStorageKey());
       if (dataStr) {
-        const data = JSON.parse(dataStr);
-        upgradeIfNeeded(data);
-        loadData(data);
-        loadWorkbench(data);
+        loadProjectModel(JSON.parse(dataStr));
       } else {
-        loadData({ history: DEFAULT_PROJECT_HISTORY, expressions: '' });
+        loadProjectModel({ history: DEFAULT_PROJECT_HISTORY, expressions: '' });
       }
-      // Always add the origin geometry (datum + 3 base planes) after the
-      // pipeline completes. loadData() triggers craftService.reset() which
-      // runs the pipeline async. The pipeline emits on update$ when done.
-      let added = false;
-      const detacher = ctx.craftService.update$.attach(() => {
-        if (added) return;
-        added = true;
-        const originGeometry = createOriginGeometry();
-        const currentModels = ctx.craftService.models$.value;
-        const hasOrigin = currentModels.some(m => m.id === 'D:0');
-        if (!hasOrigin) {
-          ctx.craftService.models$.next([...currentModels, ...originGeometry]);
-        }
-        detacher();
-      });
     } catch (e) {
       console.error(e);
+      loadProjectModel({ history: DEFAULT_PROJECT_HISTORY, expressions: '' });
     }
+  }
+
+  function loadProjectModel(data: ProjectModel) {
+    upgradeIfNeeded(data);
+    loadData(data);
+    loadWorkbench(data);
+    addOriginGeometryAfterPipeline();
+  }
+
+  function addOriginGeometryAfterPipeline() {
+    // Always add the origin geometry (datum + 3 base planes) after the
+    // pipeline completes. loadData() triggers craftService.reset() which
+    // runs the pipeline async. The pipeline emits on update$ when done.
+    let added = false;
+    const detacher = ctx.craftService.update$.attach(() => {
+      if (added) return;
+      added = true;
+      const originGeometry = createOriginGeometry();
+      const currentModels = ctx.craftService.models$.value;
+      const hasOrigin = currentModels.some(m => m.id === 'D:0');
+      if (!hasOrigin) {
+        ctx.craftService.models$.next([...currentModels, ...originGeometry]);
+      }
+      detacher();
+    });
   }
 
   function upgradeIfNeeded(data: ProjectModel) {
@@ -168,15 +316,34 @@ export function initProjectService(ctx: ApplicationContext, id: string, hints: a
 
 }
 
+function safeFileName(name) {
+  return String(name || 'jsketcher-project')
+    .trim()
+    .replace(/[<>:"/\\|?*\x00-\x1F]/g, '-')
+    .replace(/\.+$/, '') || 'jsketcher-project';
+}
+
 function parseHintsFromLocation() {
   let hints = window.location.hash.substring(1);
   if (!hints) {
     hints = window.location.search.substring(1);
   }
   if (!hints) {
-    hints = "DEFAULT";
+    hints = createProjectUuid();
+    window.history.replaceState(null, '', '?' + hints);
   }
   return parseHints(hints);
+}
+
+function createProjectUuid() {
+  if (window.crypto && 'randomUUID' in window.crypto) {
+    return window.crypto.randomUUID();
+  }
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
 }
 
 function parseHints(hints) {

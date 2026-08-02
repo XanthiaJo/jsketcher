@@ -14,6 +14,7 @@ import {ExpressionBundleContext} from "cad/expressions/expressionsBundle";
 import {LocationBundleContext} from "cad/location/LocationBundle";
 import {RemotePartsBundleContext} from "cad/partImport/remotePartsBundle";
 import {ProjectManagerBundleContext} from "cad/projectManager/projectManagerBundle";
+import {RemoteProjectBundleContext} from "cad/remoteProjectBundle";
 import {EntityContextBundleContext} from "cad/scene/entityContextBundle";
 import {HighlightBundleContext} from "cad/scene/highlightBundle";
 import {SceneBundleContext} from "cad/scene/sceneBundle";
@@ -41,6 +42,7 @@ export interface ApplicationContext extends
   LocationBundleContext,
   RemotePartsBundleContext,
   ProjectManagerBundleContext,
+  RemoteProjectBundleContext,
   EntityContextBundleContext,
   HighlightBundleContext,
   SceneBundleContext,
