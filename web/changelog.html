@@ -91,6 +91,7 @@
 
       loadSharedScript('global-bar.js');
       loadSharedScript('site-header.js');
+      loadSharedScript('site-footer.js');
     })();
   </script>
   <script src="./js/shared-shell-fallback.js" defer></script>
@@ -125,11 +126,8 @@
     </aside>
   </main>
 
-  <footer class="site-footer">
-    <div class="shell footer-row">
-      <div>JSketcher</div>
-    </div>
-  </footer>
+  <script>window.SITE_FOOTER = { label: 'JSketcher', buildInfoSrc: '/js/buildInfo.js' };</script>
+  <div id="site-footer"></div>
 
   <script>
     (function () {

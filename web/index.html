@@ -94,6 +94,7 @@
 
       loadSharedScript('global-bar.js');
       loadSharedScript('site-header.js');
+      loadSharedScript('site-footer.js');
     })();
   </script>
   <script src="./js/shared-shell-fallback.js" defer></script>
@@ -101,6 +102,8 @@
   <a id="downloader" style="display: none;" ></a>
   <input id="uploader" style="display: none;" type="file">
   <div id="app" class="jsketcher-app"></div>
+  <script>window.SITE_FOOTER = { label: 'JSketcher', buildInfoSrc: '/js/buildInfo.js' };</script>
+  <div id="site-footer"></div>
   <script src="./static/index.bundle.js"></script>
 </body>
 </html>

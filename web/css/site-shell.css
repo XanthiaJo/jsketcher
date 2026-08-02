@@ -8,7 +8,8 @@
 }
 
 .page-jsketcher .global-bar,
-.page-jsketcher .site-header {
+.page-jsketcher .site-header,
+.page-jsketcher .site-footer {
   flex-shrink: 0;
 }
 

@@ -514,11 +514,28 @@ if (format === 'html') {
   content = lines.join('\n');
 }
 
+function writeBuildInfo() {
+  const buildInfoPath = resolve(root, 'web/js/buildInfo.js');
+  const buildInfo = `window.BUILD_INFO = {\n` +
+    `  version: "${currentVersion}",\n` +
+    `  productionVersion: "${currentVersion}",\n` +
+    `  commit: "${shortSha}",\n` +
+    `  commitCount: "${commitCount}",\n` +
+    `  forkCommitCount: "${forkCommitCount}"\n` +
+    `};\n`;
+
+  mkdirSync(dirname(buildInfoPath), { recursive: true });
+  writeFileSync(buildInfoPath, buildInfo, 'utf8');
+  return buildInfoPath;
+}
+
 // Write output
 mkdirSync(dirname(outputPath), { recursive: true });
 writeFileSync(outputPath, content, 'utf8');
+const buildInfoPath = writeBuildInfo();
 
 console.log(`Generated ${outputPath}`);
+console.log(`Generated ${buildInfoPath}`);
 console.log(`  Format: ${format}`);
 console.log(`  Version: ${currentVersion}`);
 console.log(`  ${forkCommitCount} fork-only commits (out of ${commitCount} total)`);
