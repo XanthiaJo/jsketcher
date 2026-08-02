@@ -8,6 +8,7 @@
         <a class="chip color-pair-sky" href="#ui-changes">Interface</a>
         <a class="chip color-pair-stone" href="#docs-changes">Documentation</a>
         <a class="chip color-pair-plum" href="#refactor-changes">Refactors</a>
+        <a class="chip color-pair-olive" href="#test-changes">Tests</a>
         <a class="chip color-pair-ink" href="#chore-changes">Maintenance</a>
         <a class="chip color-pair-ink" href="#other-changes">Other Changes</a>
       </nav>
@@ -19,6 +20,20 @@
     <div class="container-section-header">Versions</div>
     <div class="container-section-body">
       <ul class="list">
+        <li><a href="#v0.10.3.2"><span class="caption">v0.10.3.2</span></a></li>
+        <li><a href="#v0.10.3.1"><span class="caption">v0.10.3.1</span></a></li>
+        <li><a href="#v0.10.3"><span class="caption">v0.10.3</span></a></li>
+        <li><a href="#v0.10.2"><span class="caption">v0.10.2</span></a></li>
+        <li><a href="#v0.10.1"><span class="caption">v0.10.1</span></a></li>
+        <li><a href="#v0.10.0.4"><span class="caption">v0.10.0.4</span></a></li>
+        <li><a href="#v0.10.0.3"><span class="caption">v0.10.0.3</span></a></li>
+        <li><a href="#v0.10.0.2"><span class="caption">v0.10.0.2</span></a></li>
+        <li><a href="#v0.10.0.1"><span class="caption">v0.10.0.1</span></a></li>
+        <li><a href="#v0.10.0"><span class="caption">v0.10.0</span></a></li>
+        <li><a href="#v0.9.0"><span class="caption">v0.9.0</span></a></li>
+        <li><a href="#v0.8.0"><span class="caption">v0.8.0</span></a></li>
+        <li><a href="#v0.7.1"><span class="caption">v0.7.1</span></a></li>
+        <li><a href="#v0.7.0"><span class="caption">v0.7.0</span></a></li>
         <li><a href="#v0.6.0.5"><span class="caption">v0.6.0.5</span></a></li>
         <li><a href="#v0.6.0.4"><span class="caption">v0.6.0.4</span></a></li>
         <li><a href="#v0.6.0.3"><span class="caption">v0.6.0.3</span></a></li>
@@ -45,14 +60,63 @@
   <section class="panel panel--padded">
     <h3>Build Snapshot</h3>
     <div class="container-actions">
-      <span class="chip color-pair-ink">Version v0.6.0.5</span>
-      <span class="chip color-pair-stone">18 fork commits</span>
-      <span class="chip color-pair-stone">1802 total commits</span>
+      <span class="chip color-pair-ink">Version v0.10.3.2</span>
+      <span class="chip color-pair-stone">32 fork commits</span>
+      <span class="chip color-pair-stone">1816 total commits</span>
     </div>
   </section>
   <section class="panel panel--padded" id="feature-changes">
     <h4>Features</h4>
     <ul class="list">
+      <li id="v0.10.0">
+        <div class="container-content">
+          <div class="container-actions">
+          <span class="chip color-pair-gold">Features</span>
+            <span class="caption">v0.10.0 - 7986d853 - 2026-08-02</span>
+          </div>
+          <h5>Separate account and browser projects</h5>
+        </div>
+      </li>
+      <li id="v0.9.0">
+        <div class="container-content">
+          <div class="container-actions">
+          <span class="chip color-pair-gold">Features</span>
+            <span class="caption">v0.9.0 - 73af5e59 - 2026-08-02</span>
+          </div>
+          <h5>Save and load account projects</h5>
+        </div>
+      </li>
+      <li id="v0.8.0">
+        <div class="container-content">
+          <div class="container-actions">
+          <span class="chip color-pair-gold">Features</span>
+            <span class="caption">v0.8.0 - 0f0af365 - 2026-08-02</span>
+          </div>
+          <h5>Add shared site footer and build info generation</h5>
+          <ul>
+            <li>generate-changelog.mjs now writes web/js/buildInfo.js with version and commit metadata alongside the changelog output</li>
+            <li>index.html and changelog.html load the shared site-footer script and render it via window.SITE_FOOTER config</li>
+            <li>roadmap.html updated to match the shared footer pattern</li>
+            <li>site-shell.css allows the site-footer to flex-shrink like the global bar and site header</li>
+            <li>changelog.md regenerated with latest fork commits</li>
+          </ul>
+        </div>
+      </li>
+      <li id="v0.7.0">
+        <div class="container-content">
+          <div class="container-actions">
+          <span class="chip color-pair-gold">Features</span>
+            <span class="caption">v0.7.0 - 557de613 - 2026-08-02</span>
+          </div>
+          <h5>Generate changelog HTML fragment matching KS pattern</h5>
+          <ul>
+            <li>add --format=html to generate-changelog.mjs producing panels, chips, and sidebar blocks (Change Types, Versions) matching the KnitStitch changelog structure</li>
+            <li>update changelog.html to fetch the pre-generated HTML fragment instead of rendering markdown client-side with marked.js</li>
+            <li>add gen-changelog grunt task that generates both md and html during build</li>
+            <li>update npm changelog script and webhook deploy commands to generate both formats</li>
+          </ul>
+        </div>
+      </li>
       <li id="v0.6.0">
         <div class="container-content">
           <div class="container-actions">
@@ -115,6 +179,48 @@
   <section class="panel panel--padded" id="fix-changes">
     <h4>Fixes</h4>
     <ul class="list">
+      <li id="v0.10.3">
+        <div class="container-content">
+          <div class="container-actions">
+          <span class="chip color-pair-sage">Fixes</span>
+            <span class="caption">v0.10.3 - a09f9899 - 2026-08-02</span>
+          </div>
+          <h5>Import icons from set entrypoints</h5>
+        </div>
+      </li>
+      <li id="v0.10.2">
+        <div class="container-content">
+          <div class="container-actions">
+          <span class="chip color-pair-sage">Fixes</span>
+            <span class="caption">v0.10.2 - 8121dc5f - 2026-08-02</span>
+          </div>
+          <h5>Guard optional cad services</h5>
+        </div>
+      </li>
+      <li id="v0.10.1">
+        <div class="container-content">
+          <div class="container-actions">
+          <span class="chip color-pair-sage">Fixes</span>
+            <span class="caption">v0.10.1 - 4d6e4b7a - 2026-08-02</span>
+          </div>
+          <h5>Seed origin geometry during project load</h5>
+        </div>
+      </li>
+      <li id="v0.7.1">
+        <div class="container-content">
+          <div class="container-actions">
+          <span class="chip color-pair-sage">Fixes</span>
+            <span class="caption">v0.7.1 - 1c83eed8 - 2026-08-02</span>
+          </div>
+          <h5>Always seed origin geometry after pipeline completes</h5>
+          <ul>
+            <li>the origin datum and base planes were only added for new projects with no saved data, so they never appeared on the live site where users have persisted projects in localStorage</li>
+            <li>load() now always attaches a one-time listener to craftService.update$ (emitted by the pipeline interceptor on completion) and adds the origin geometry regardless of saved state</li>
+            <li>duplicate check prevents re-adding if the origin datum (id D:0) already exists in the model set</li>
+            <li>delete body operation now protects all origin geometry (datum + planes) via originatingOperation === -1 sentinel check</li>
+          </ul>
+        </div>
+      </li>
       <li id="v0.4.1">
         <div class="container-content">
           <div class="container-actions">
@@ -141,6 +247,15 @@
   <section class="panel panel--padded" id="ui-changes">
     <h4>Interface</h4>
     <ul class="list">
+      <li id="v0.10.3.1">
+        <div class="container-content">
+          <div class="container-actions">
+          <span class="chip color-pair-sky">Interface</span>
+            <span class="caption">v0.10.3.1 - 1a27faff - 2026-08-02</span>
+          </div>
+          <h5>Move theme toggle to toolbar</h5>
+        </div>
+      </li>
       <li id="v0.5.0.2">
         <div class="container-content">
           <div class="container-actions">
@@ -193,6 +308,15 @@
   <section class="panel panel--padded" id="docs-changes">
     <h4>Documentation</h4>
     <ul class="list">
+      <li id="v0.10.0.2">
+        <div class="container-content">
+          <div class="container-actions">
+          <span class="chip color-pair-stone">Documentation</span>
+            <span class="caption">v0.10.0.2 - e9049ef9 - 2026-08-02</span>
+          </div>
+          <h5>Add project persistence and touch workflow plans</h5>
+        </div>
+      </li>
       <li id="v0.6.0.5">
         <div class="container-content">
           <div class="container-actions">
@@ -263,9 +387,50 @@
       </li>
     </ul>
   </section>
+  <section class="panel panel--padded" id="test-changes">
+    <h4>Tests</h4>
+    <ul class="list">
+      <li id="v0.10.0.1">
+        <div class="container-content">
+          <div class="container-actions">
+          <span class="chip color-pair-olive">Tests</span>
+            <span class="caption">v0.10.0.1 - c782d314 - 2026-08-02</span>
+          </div>
+          <h5>Add project name conflict coverage</h5>
+        </div>
+      </li>
+    </ul>
+  </section>
   <section class="panel panel--padded" id="chore-changes">
     <h4>Maintenance</h4>
     <ul class="list">
+      <li id="v0.10.3.2">
+        <div class="container-content">
+          <div class="container-actions">
+          <span class="chip color-pair-ink">Maintenance</span>
+            <span class="caption">v0.10.3.2 - c202709a - 2026-08-02</span>
+          </div>
+          <h5>Update package metadata</h5>
+        </div>
+      </li>
+      <li id="v0.10.0.4">
+        <div class="container-content">
+          <div class="container-actions">
+          <span class="chip color-pair-ink">Maintenance</span>
+            <span class="caption">v0.10.0.4 - 0eef9491 - 2026-08-02</span>
+          </div>
+          <h5>Stop tracking generated build info</h5>
+        </div>
+      </li>
+      <li id="v0.10.0.3">
+        <div class="container-content">
+          <div class="container-actions">
+          <span class="chip color-pair-ink">Maintenance</span>
+            <span class="caption">v0.10.0.3 - c0ba36be - 2026-08-02</span>
+          </div>
+          <h5>Add jsketcher deploy test helper</h5>
+        </div>
+      </li>
       <li id="v0.6.0.4">
         <div class="container-content">
           <div class="container-actions">

@@ -1,6 +1,6 @@
 # Changelog
 
-> **v0.7.0** — 19 fork commits · 1803 total commits · HEAD 557de613
+> **v0.10.3.2** — 32 fork commits · 1816 total commits · HEAD c202709a
 
 > Only commits unique to this fork are listed. Upstream history is excluded.
 > Generated from conventional commits using `git cherry upstream/main HEAD`.
@@ -50,6 +50,24 @@ _Last generated: 2026-08-02_
 - add gen-changelog grunt task that generates both md and html during build
 - update npm changelog script and webhook deploy commands to generate both formats
 
+### Add shared site footer and build info generation
+
+**v0.8.0** · 0f0af365 · 2026-08-02
+
+- generate-changelog.mjs now writes web/js/buildInfo.js with version and commit metadata alongside the changelog output
+- index.html and changelog.html load the shared site-footer script and render it via window.SITE_FOOTER config
+- roadmap.html updated to match the shared footer pattern
+- site-shell.css allows the site-footer to flex-shrink like the global bar and site header
+- changelog.md regenerated with latest fork commits
+
+### Save and load account projects
+
+**v0.9.0** · 73af5e59 · 2026-08-02
+
+### Separate account and browser projects
+
+**v0.10.0** · 7986d853 · 2026-08-02
+
 ---
 
 ## Fixes
@@ -68,6 +86,27 @@ _Last generated: 2026-08-02_
 - guard PickControlBundle and DomBundle tab switch against a missing renderer
 - guard ExportBundle image/png export against a missing renderer or cadScene
 - guard Viewer dispose against a missing renderer
+
+### Always seed origin geometry after pipeline completes
+
+**v0.7.1** · 1c83eed8 · 2026-08-02
+
+- the origin datum and base planes were only added for new projects with no saved data, so they never appeared on the live site where users have persisted projects in localStorage
+- load() now always attaches a one-time listener to craftService.update$ (emitted by the pipeline interceptor on completion) and adds the origin geometry regardless of saved state
+- duplicate check prevents re-adding if the origin datum (id D:0) already exists in the model set
+- delete body operation now protects all origin geometry (datum + planes) via originatingOperation === -1 sentinel check
+
+### Seed origin geometry during project load
+
+**v0.10.1** · 4d6e4b7a · 2026-08-02
+
+### Guard optional cad services
+
+**v0.10.2** · 8121dc5f · 2026-08-02
+
+### Import icons from set entrypoints
+
+**v0.10.3** · a09f9899 · 2026-08-02
 
 ---
 
@@ -98,6 +137,10 @@ _Last generated: 2026-08-02_
 - refresh heads-up toolbar layout and styles
 - adjust control bar and bottom stack spacing
 
+### Move theme toggle to toolbar
+
+**v0.10.3.1** · 1a27faff · 2026-08-02
+
 ---
 
 ## Documentation
@@ -127,6 +170,10 @@ _Last generated: 2026-08-02_
 - add www.auth.misssponto.me.uk nginx config (root BetterAuth, /webhook proxy to 3002, / proxy to 3000)
 - add setup scripts for nvm, SSH keys, and git credentials used during VPS provisioning
 
+### Add project persistence and touch workflow plans
+
+**v0.10.0.2** · e9049ef9 · 2026-08-02
+
 ---
 
 ## Refactors
@@ -140,6 +187,14 @@ _Last generated: 2026-08-02_
 - update openFaceView and sketcherUIContrib
 - minor craftBundle and Wizard tweaks
 - extend projectBundle load handling
+
+---
+
+## Tests
+
+### Add project name conflict coverage
+
+**v0.10.0.1** · c782d314 · 2026-08-02
 
 ---
 
@@ -164,6 +219,18 @@ _Last generated: 2026-08-02_
 - add .env.example with GITHUB_WEBHOOK_SECRET template
 - add .env to .gitignore
 - document setup, nginx config, and manual fallback in AGENTS.md
+
+### Add jsketcher deploy test helper
+
+**v0.10.0.3** · c0ba36be · 2026-08-02
+
+### Stop tracking generated build info
+
+**v0.10.0.4** · 0eef9491 · 2026-08-02
+
+### Update package metadata
+
+**v0.10.3.2** · c202709a · 2026-08-02
 
 ---
 

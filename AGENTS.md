@@ -21,8 +21,9 @@ The VPS auto-deploys when GitHub receives a push to `main`.
 3. Runs the deploy commands:
    - `git fetch origin main` + `git reset --hard origin/main`
    - `npm ci`
-   - `node scripts/generate-changelog.mjs --root=. --output=docs/changelog.md`
-   - `npx grunt` (builds static output to `dist/`)
+   - `node scripts/generate-changelog.mjs --root=. --format=md --output=docs/changelog.md`
+   - `node scripts/generate-changelog.mjs --root=. --format=html --output=web/changelog-fragment.html`
+   - `npx grunt` (regenerates docs/changelog metadata, then builds static output to `dist/`)
 
 nginx serves the `dist/` directory directly as the document root. No Node app process to reload — the webhook server is the only PM2 process.
 
@@ -48,7 +49,8 @@ cd /path/to/jsketcher
 git fetch origin main
 git reset --hard origin/main
 npm ci
-node scripts/generate-changelog.mjs --root=. --output=docs/changelog.md
+node scripts/generate-changelog.mjs --root=. --format=md --output=docs/changelog.md
+node scripts/generate-changelog.mjs --root=. --format=html --output=web/changelog-fragment.html
 npx grunt
 ```
 

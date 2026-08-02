@@ -102,7 +102,7 @@ module.exports = function(grunt) {
     });
   });
 
-  grunt.registerTask('default', ['clean', 'build', 'copy:resources', 'copy:lib_assets', 'gen-docs', 'gen-changelog', 'mark-revision', 'show-revision']);
+  grunt.registerTask('default', ['clean', 'build', 'gen-docs', 'gen-changelog', 'copy:resources', 'copy:lib_assets', 'mark-revision', 'show-revision']);
 
   grunt.registerTask('gen-docs', ['copy:docs', 'process-markdown']);
 
