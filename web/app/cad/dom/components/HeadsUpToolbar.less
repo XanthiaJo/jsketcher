@@ -1,12 +1,19 @@
 @import "~ui/styles/theme.less";
 
+.ribbon {
+  padding: 0 3px;
+  overflow: visible;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
 .quickButtons {
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
   flex: 0 0;
   border-right: 1px solid @app-headsup-splitter;
-  padding-right: 3px;
+  margin-right: 1px;
+  padding-right: 2px;
   & > * {
     font-size: 16px;
     padding: 5px 2px;
@@ -18,11 +25,119 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  & > * {
-    padding: 3px 4px;
-  }
+  min-width: 0;
+  overflow: visible;
+}
+
+.section {
+  display: flex;
+  align-items: center;
+  padding: 3px 3px;
+  border-right: 1px solid @app-headsup-splitter;
+}
+
+.section:last-child {
+  border-right: 0;
+}
+
+.sectionToggle {
+  display: none;
+}
+
+.sectionActions {
+  display: flex;
+  align-items: center;
+  gap: 0;
+
   svg {
     width: 24px;
     height: 24px;
+  }
+}
+
+@media (max-width: 1180px) {
+  .ribbon {
+    min-height: 38px;
+    padding: 1px 3px;
+
+    :global(.x-Toolbar-button) {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 25px;
+      height: 28px;
+      margin: 0 1px;
+      padding: 1px 3px;
+      border-radius: 3px;
+      line-height: 1;
+    }
+
+    :global(.x-Toolbar-button) > div {
+      display: none;
+    }
+
+    :global(.x-Toolbar-button) svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  .mainActions {
+    flex-wrap: wrap;
+    gap: 3px;
+    padding-left: 2px;
+  }
+
+  .section {
+    position: relative;
+    display: block;
+    padding: 0;
+    border-right: 0;
+  }
+
+  .sectionToggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 30px;
+    min-width: 74px;
+    padding: 0 8px;
+    border: 1px solid @app-headsup-splitter;
+    border-radius: 4px;
+    color: @toolbar-button-color;
+    background: @toolbar-bg;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    pointer-events: auto;
+    text-transform: none;
+  }
+
+  .sectionToggle:after {
+    content: "▾";
+    margin-left: 5px;
+    font-size: 9px;
+  }
+
+  .sectionOpen .sectionToggle:after {
+    transform: rotate(180deg);
+  }
+
+  .sectionActions {
+    display: none;
+    position: absolute;
+    z-index: 20;
+    top: calc(100% + 3px);
+    left: 0;
+    min-width: max-content;
+    padding: 4px;
+    border: 1px solid @app-headsup-splitter;
+    border-radius: 5px;
+    background: @toolbar-bg;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.16);
+  }
+
+  .sectionOpen .sectionActions {
+    display: flex;
   }
 }

@@ -1,31 +1,41 @@
 import React, {useContext, useEffect, useRef, useState} from 'react';
-import {Spherical} from 'three';
+import {Matrix4, Spherical} from 'three';
 import {ReactApplicationContext} from "cad/dom/ReactApplicationContext";
 import ls from './ViewCube.less';
 
 const faces = [
-  {id: 'StandardViewFront', label: 'Front', className: ls.front},
-  {id: 'StandardViewBack', label: 'Back', className: ls.back},
-  {id: 'StandardViewRight', label: 'Right', className: ls.right},
-  {id: 'StandardViewLeft', label: 'Left', className: ls.left},
-  {id: 'StandardViewTop', label: 'Top', className: ls.top},
-  {id: 'StandardViewBottom', label: 'Bottom', className: ls.bottom},
+  {id: 'StandardViewFront', label: 'Front', className: ls.front, labelClassName: ls.labelFront},
+  {id: 'StandardViewBack', label: 'Back', className: ls.back, labelClassName: ls.labelBack},
+  {id: 'StandardViewRight', label: 'Right', className: ls.right, labelClassName: ls.labelRight},
+  {id: 'StandardViewLeft', label: 'Left', className: ls.left, labelClassName: ls.labelLeft},
+  {id: 'StandardViewTop', label: 'Top', className: ls.bottom, labelClassName: ls.labelTop},
+  {id: 'StandardViewBottom', label: 'Bottom', className: ls.top, labelClassName: ls.labelBottom},
 ];
+
+const syncRotation = new Matrix4();
 
 function cameraTransform(ctx) {
   const sceneSetup = ctx?.services?.viewer?.sceneSetup;
   const camera = sceneSetup?.camera;
-  const target = sceneSetup?.trackballControls?.target;
-  if (!camera || !target) {
+  if (!camera) {
     return 'rotateX(-18deg) rotateY(36deg)';
   }
 
-  const direction = camera.position.clone().sub(target).normalize();
-  const yaw = Math.atan2(direction.x, direction.z);
-  const pitch = Math.asin(direction.y);
-  const roll = Math.atan2(camera.up.x, camera.up.y);
+  syncRotation.extractRotation(camera.matrixWorldInverse);
 
-  return `rotateZ(${roll}rad) rotateX(${-pitch}rad) rotateY(${-yaw}rad)`;
+  const elements = syncRotation.elements.map(value => {
+    if (!Number.isFinite(value)) {
+      return 0;
+    }
+    return Number(value.toFixed(8));
+  });
+
+  return `matrix3d(${[
+    elements[0], -elements[1], elements[2], elements[3],
+    elements[4], -elements[5], elements[6], elements[7],
+    elements[8], -elements[9], elements[10], elements[11],
+    elements[12], -elements[13], elements[14], elements[15],
+  ].join(',')})`;
 }
 
 function rotateCamera(ctx, dx: number, dy: number) {
@@ -39,7 +49,7 @@ function rotateCamera(ctx, dx: number, dy: number) {
   const eye = camera.position.clone().sub(target);
   const spherical = new Spherical().setFromVector3(eye);
   spherical.theta -= dx * 0.018;
-  spherical.phi -= dy * 0.018;
+  spherical.phi += dy * 0.018;
   spherical.makeSafe();
 
   eye.setFromSpherical(spherical);
@@ -136,7 +146,7 @@ export default function ViewCube() {
             onClick={runView(face.id)}
             title={`View ${face.label}`}
           >
-            {face.label}
+            <span className={`${ls.faceLabel} ${face.labelClassName}`}>{face.label}</span>
           </button>
         )}
       </div>

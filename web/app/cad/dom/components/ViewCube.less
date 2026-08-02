@@ -2,13 +2,13 @@
 
 @cube-size: 72px;
 @cube-half: 36px;
-@cube-bg: rgba(38, 49, 64, 0.86);
-@cube-bg-soft: rgba(52, 64, 80, 0.78);
-@cube-border: rgba(146, 164, 185, 0.52);
+@cube-bg: rgba(34, 43, 54, 0.86);
+@cube-bg-soft: rgba(48, 59, 72, 0.78);
+@cube-border: rgba(174, 184, 200, 0.52);
 @cube-shadow: rgba(4, 8, 13, 0.36);
-@cube-text: #d7e1ec;
-@cube-hover-bg: rgba(77, 119, 152, 0.92);
-@cube-hover-border: #9fc4e4;
+@cube-text: hsl(0, 0%, 90%);
+@cube-hover-bg: rgba(125, 142, 80, 0.92);
+@cube-hover-border: #aebe79;
 
 .root {
   position: absolute;
@@ -39,7 +39,6 @@
   width: @cube-size;
   height: @cube-size;
   transform-style: preserve-3d;
-  transition: transform 110ms linear;
   cursor: grab;
 
   &:active {
@@ -73,6 +72,20 @@
   &:active {
     cursor: grabbing;
   }
+}
+
+.faceLabel {
+  display: block;
+  pointer-events: none;
+}
+
+.labelFront,
+.labelBack,
+.labelRight,
+.labelLeft,
+.labelTop,
+.labelBottom {
+  transform: rotate(180deg) scaleX(-1);
 }
 
 .front {
@@ -160,12 +173,37 @@
 }
 
 body:global(.theme-light) {
+  .scene {
+    filter: drop-shadow(0 10px 18px rgba(50, 75, 96, 0.18));
+  }
+
   .home {
-    background: rgba(255, 255, 255, 0.78);
+    background: rgba(225, 230, 215, 0.9);
+    border-color: #cdd5bf;
+    color: #223247;
+
+    &:hover {
+      background: #7d8e50;
+      border-color: #5a6b3d;
+      color: #fff;
+    }
   }
 
   .face {
-    background: linear-gradient(145deg, rgba(242, 246, 250, 0.9), rgba(216, 225, 234, 0.88));
-    color: #334252;
+    background: linear-gradient(145deg, rgba(238, 241, 234, 0.94), rgba(225, 230, 215, 0.9));
+    border-color: rgba(174, 188, 134, 0.68);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.55);
+    color: #223247;
+
+    &:hover {
+      background: #7d8e50;
+      border-color: #5a6b3d;
+      color: #fff;
+    }
+  }
+
+  .homeRoof,
+  .homeBody {
+    border-color: #223247;
   }
 }
