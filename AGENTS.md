@@ -10,6 +10,48 @@ This fork uses StructuredChaos `css/shared.css`, `js/global-bar.js`, and `js/sit
 
 The app index is the 3D CAD page. The old standalone `sketcher.html` 2D entry has been removed from this fork. Local dev runs on `http://localhost:3001`; production is static `dist/` output, not a Node app.
 
+## VPS Deploy via GitHub Webhook
+
+The VPS auto-deploys when GitHub receives a push to `main`.
+
+`scripts/webhook-server.mjs` is a small Node.js HTTP server (no external dependencies) that:
+
+1. Verifies the GitHub HMAC-SHA256 signature using `GITHUB_WEBHOOK_SECRET` from `.env`
+2. Checks that the push is to `refs/heads/main`
+3. Runs the deploy commands:
+   - `git fetch origin main` + `git reset --hard origin/main`
+   - `npm ci`
+   - `node scripts/generate-changelog.mjs --root=. --output=docs/changelog.md`
+   - `npx grunt` (builds static output to `dist/`)
+
+nginx serves the `dist/` directory directly as the document root. No Node app process to reload — the webhook server is the only PM2 process.
+
+### Setup
+
+1. Set `GITHUB_WEBHOOK_SECRET` in `.env` on the VPS
+2. `pm2 start ecosystem.config.cjs && pm2 save && pm2 startup`
+3. Configure nginx:
+   - `location /webhook { proxy_pass http://127.0.0.1:3004; }`
+   - `location / { root /path/to/jsketcher/dist; try_files $uri $uri/ /index.html; }`
+4. In GitHub repo settings → Webhooks → Add webhook:
+   - Payload URL: `https://jsketcher.misssponto.me.uk/webhook`
+   - Content type: `application/json`
+   - Secret: same value as `GITHUB_WEBHOOK_SECRET`
+   - Events: Just the push event
+
+### Manual deploy (fallback)
+
+SSH into the VPS and run:
+
+```bash
+cd /path/to/jsketcher
+git fetch origin main
+git reset --hard origin/main
+npm ci
+node scripts/generate-changelog.mjs --root=. --output=docs/changelog.md
+npx grunt
+```
+
 ## No underscore prefix on private members
 
 Do not use underscore prefix for private fields or methods:
