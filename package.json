@@ -14,6 +14,7 @@
     "before-main-branch-merge": "npm run lint && npm run check-code && npm run checks-passed-banner",
     "cypress": "npx cypress open",
     "test:theme": "node test/theme.test.js",
+    "test:project-names": "node --experimental-default-type=module --test test/projectNamePolicy.test.mjs",
     "changelog": "node scripts/generate-changelog.mjs --root=. --format=md --output=docs/changelog.md && node scripts/generate-changelog.mjs --root=. --format=html --output=web/changelog-fragment.html"
   },
   "repository": {
