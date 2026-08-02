@@ -31,7 +31,7 @@ export const ViewSyncBundle = {
     });
 
     streams.cadRegistry.update.attach(sceneSynchronizer(ctx));
-    streams.sketcher.update.attach(mFace => mFace.ext.view.updateSketch());
+    streams.sketcher.update.attach(mFace => mFace.ext?.view?.updateSketch());
   },
 }
 

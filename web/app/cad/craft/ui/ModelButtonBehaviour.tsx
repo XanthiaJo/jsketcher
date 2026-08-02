@@ -7,6 +7,9 @@ import {MOpenFaceShell} from "cad/model/mopenFace";
 import {MObject} from "cad/model/mobject";
 import {ModelIcon} from "cad/craft/ui/ModelIcon";
 import {SafeLength} from "cad/craft/ui/SafeLength";
+import {constant} from "lstream";
+
+const NO_HIGHLIGHTS = constant(new Set<string>());
 
 interface IModelButtonBehavior {
   select: () => void;
@@ -31,7 +34,7 @@ export function ModelButtonBehavior({children, model, controlVisibility}: {
   }
 
   const selection: string[] = useStream(ctx => ctx.streams.selection.all);
-  const highlights = useStream(ctx => ctx.highlightService.highlighted$);
+  const highlights = useStream(ctx => ctx.highlightService ? ctx.highlightService.highlighted$ : NO_HIGHLIGHTS);
 
   let typeLabel = model.TYPE as string;
   const idLabel: string = model.id;
@@ -47,8 +50,8 @@ export function ModelButtonBehavior({children, model, controlVisibility}: {
   const selected = selection.indexOf(model.id) !== -1;
   const highlighted = highlights.has(model.id)
 
-  const onMouseEnter= () => ctx.highlightService.highlight(model.id);
-  const onMouseLeave= () => ctx.highlightService.unHighlight(model.id);
+  const onMouseEnter= () => ctx.highlightService && ctx.highlightService.highlight(model.id);
+  const onMouseLeave= () => ctx.highlightService && ctx.highlightService.unHighlight(model.id);
 
   const label = <>
     <ModelIcon entityType={model.TYPE} style={{marginRight: 5}} />
@@ -56,7 +59,7 @@ export function ModelButtonBehavior({children, model, controlVisibility}: {
   </>;
 
   const controls = <>
-    {controlVisibility && <VisibleSwitch modelId={visibilityOf.id}/>}
+    {controlVisibility && ctx.attributesService && <VisibleSwitch modelId={visibilityOf.id}/>}
   </>;
 
   return children({
