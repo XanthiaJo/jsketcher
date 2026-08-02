@@ -99,14 +99,23 @@ export function initProjectService(ctx: ApplicationContext, id: string, hints: a
         loadData(data);
         loadWorkbench(data);
       } else {
-        // no saved project — seed the default datum and three base planes so
-        // the user starts with construction geometry at the origin, like
-        // Fusion 360 and most other CAD tools
         loadData({ history: DEFAULT_PROJECT_HISTORY, expressions: '' });
-        // add the origin geometry directly to the model set (not in history)
-        const originGeometry = createOriginGeometry();
-        ctx.craftService.models$.next(originGeometry);
       }
+      // Always add the origin geometry (datum + 3 base planes) after the
+      // pipeline completes. loadData() triggers craftService.reset() which
+      // runs the pipeline async. The pipeline emits on update$ when done.
+      let added = false;
+      const detacher = ctx.craftService.update$.attach(() => {
+        if (added) return;
+        added = true;
+        const originGeometry = createOriginGeometry();
+        const currentModels = ctx.craftService.models$.value;
+        const hasOrigin = currentModels.some(m => m.id === 'D:0');
+        if (!hasOrigin) {
+          ctx.craftService.models$.next([...currentModels, ...originGeometry]);
+        }
+        detacher();
+      });
     } catch (e) {
       console.error(e);
     }

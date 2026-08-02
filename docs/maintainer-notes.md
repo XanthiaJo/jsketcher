@@ -46,15 +46,15 @@ When adding a new cross-cutting service, follow the bundle pattern:
 
 ## Default Project Seeding
 
-New or empty projects start with construction geometry at the origin, mirroring Fusion 360 and most other CAD tools: an origin datum and the three base planes (XY, XZ, ZY).
+All projects (new and saved) start with construction geometry at the origin, mirroring Fusion 360 and most other CAD tools: an origin datum and the three base planes (XY, XZ, ZY).
 
-- `web/app/cad/projectBundle.ts` — `DEFAULT_PROJECT_HISTORY` is the seed history (a single `DATUM_CREATE` at origin). `load()` seeds this history via `loadData()` when no saved project data is found in storage.
-- `web/app/cad/craft/datum/create/createDatumOperation.js` — the `DATUM_CREATE` operation checks if the datum is at the origin (x=0, y=0, z=0, no rotations, no face). If so, it marks the datum with `originatingOperation = -1` (sentinel: not from history) and creates the three base planes as `MOpenFaceShell` instances with `{ width: 100, height: 100 }` bounds (smaller than the 750x750 default for user-created planes), including them in the operation result.
-- The datum and planes are part of the operation's `created` array, so they go through the normal pipeline and are added to the model set. Both have `originatingOperation = -1` and are not in the history timeline as separate items.
-- `modules/workbenches/modeler/features/deleteBody/deleteBody.operation.ts` — the delete body operation checks if the origin datum (id `D:0`) is in the selection and throws an error if so, preventing deletion.
-- Saved projects are loaded as-is — the seed only applies to projects with no stored history.
+- `web/app/cad/projectBundle.ts` — `DEFAULT_PROJECT_HISTORY` is empty (the datum and planes are not in history). `load()` always calls `loadData()` (with saved data or empty defaults), then attaches a one-time listener to `craftService.update$` that adds the origin geometry after the pipeline completes.
+- `createOriginGeometry()` creates the origin datum (id `D:0`, `originatingOperation = -1`) and three base planes as `MOpenFaceShell` instances with `{ width: 100, height: 100 }` bounds. All have `originatingOperation = -1` (sentinel: not from history).
+- `web/app/cad/craft/craftBundle.ts` — the pipeline interceptor emits on `update$` after the pipeline completes (both success and failure). This signals that models are settled and ready for the origin geometry to be added.
+- `modules/workbenches/modeler/features/deleteBody/deleteBody.operation.ts` — the delete body operation checks if any tool has `originatingOperation === -1` and throws an error if so, preventing deletion of the origin datum and base planes.
+- The origin geometry is always added regardless of whether there's a saved project. Duplicates are avoided by checking if a model with id `D:0` already exists in the model set.
 - `empty()` (used by the import flow to wipe before loading) is intentionally not changed; it still loads a truly empty `{history: [], expressions: ''}` so imports aren't polluted with seed operations.
-- The datum and planes cannot be undone or deleted via the history timeline (they're part of the seed operation). The datum is protected from deletion; the planes can be deleted via the delete body action if needed.
+- The datum and planes cannot be undone or deleted via the history timeline (they're not in history). They are protected from deletion via the delete body action.
 
 The `DATUM_CREATE` operation is registered by `WorkbenchesLoaderBundle` (core operations) before `projectService.load()` runs, so the seed history is always materializable at load time.
 

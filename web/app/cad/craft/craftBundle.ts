@@ -179,7 +179,10 @@ export function activate(ctx: ApplicationContext) {
 
     runPipeline(history, beginIndex, pointer)
       .then(() => next(curr))
-      .finally(() => locked = false)
+      .finally(() => {
+        locked = false;
+        update$.next();
+      })
       .catch(reason => {
         console.error(reason.error);
         //TODO: need to find a way to propagate the error to the wizard.
@@ -187,6 +190,7 @@ export function activate(ctx: ApplicationContext) {
           ...curr,
           pointer: reason.failIndex,
         });
+        update$.next();
       });
   })
 }
