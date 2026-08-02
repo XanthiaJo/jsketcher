@@ -16,3 +16,6 @@
 /web/docs/
 pnpm-lock.yaml
 .env
+
+# generated build metadata
+/web/js/buildInfo.js
