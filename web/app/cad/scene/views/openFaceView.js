@@ -81,14 +81,18 @@ export class OpenFaceView extends SketchingView {
 
   updateBounds() {
     this.dropGeometry();
-    
+
     const bounds2d = [];
     for (const mSketchObject of this.model.sketchObjects) {
       mSketchObject.sketchPrimitive.tessellate().forEach(p => bounds2d.push(p));
     }
-    const surface = this.model.shell.surfacePrototype.boundTo(bounds2d, 750, 750, 50);
-    this.bounds = [surface.southWestPoint(), surface.southEastPoint(), 
-      surface.northEastPoint(), surface.northWestPoint()]; 
+    // use default bounds if the shell has them and there are no sketch objects
+    const defaultBounds = this.model.shell.defaultBounds;
+    const width = bounds2d.length > 0 ? 750 : (defaultBounds ? defaultBounds.width : 750);
+    const height = bounds2d.length > 0 ? 750 : (defaultBounds ? defaultBounds.height : 750);
+    const surface = this.model.shell.surfacePrototype.boundTo(bounds2d, width, height, 50);
+    this.bounds = [surface.southWestPoint(), surface.southEastPoint(),
+      surface.northEastPoint(), surface.northWestPoint()];
 
     this.createGeometry();
     this.updateVisuals();

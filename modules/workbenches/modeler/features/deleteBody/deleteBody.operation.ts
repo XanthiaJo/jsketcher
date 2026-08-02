@@ -19,6 +19,12 @@ export const DeleteBodyOperation: OperationDescriptor<DeleteBodyParams> = {
     const occ = ctx.occService;
     const oci = occ.commandInterface;
 
+    // prevent deletion of the origin datum (id starts with 'D:0')
+    const originDatum = ctx.cadRegistry.findDatum('D:0');
+    if (originDatum && params.tools.includes(originDatum)) {
+      throw new Error('Cannot delete the origin datum');
+    }
+
     const returnObject = {
       created: [],
       consumed: params.tools

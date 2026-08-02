@@ -8,6 +8,7 @@ import {useStream} from "ui/effects";
 import {ReactApplicationContext} from "cad/dom/ReactApplicationContext";
 import {resolveAppearance} from "cad/craft/operationHelper";
 import ImgIcon from "ui/components/ImgIcon";
+import {getModelerRibbonIcon} from "cad/workbench/modelerRibbonIcon";
 
 interface WizardProps {
   noFocus: boolean;
@@ -66,7 +67,7 @@ export default function Wizard(props: WizardProps) {
   const {left} = props;
   const appearance = resolveAppearance(operation, workingRequest.params);
   const title = appearance.label.toUpperCase();
-  const icon = <ImgIcon url={appearance.icon32} size={16}/>;
+  const icon = getModelerRibbonIcon(operation.id) || <ImgIcon url={appearance.icon32} size={16}/>;
 
   const Form = operation.form;
 

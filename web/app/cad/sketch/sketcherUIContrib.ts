@@ -7,6 +7,8 @@ import generalToolActions from "../../sketcher/actions/generalToolActions";
 import sketcherControlActions from "./sketcherControlActions";
 import {ApplicationContext} from "cad/context";
 import {RiCompasses2Line} from "react-icons/ri";
+import {ribbonIcon} from "cad/workbench/modelerRibbonIcon";
+import {sketcherRibbonIcon} from "cad/workbench/sketcherRibbonIcon";
 
 export default function (ctx: ApplicationContext) {
 
@@ -19,23 +21,24 @@ export default function (ctx: ApplicationContext) {
   ].map(convertSketcherAction);
 
   const SKETCHER_MODE_HEADS_UP_ACTIONS = [
-    ['sketchSaveAndExit', 'sketchExit'],
+    ['sketchSaveAndExit', sketcherRibbonIcon('sketchSaveAndExit')],
+    ['sketchExit', sketcherRibbonIcon('sketchExit')],
     '-',
-    generalToolActions.map(a => toSketcherActionId(a.id)),
+    generalToolActions.map(a => [toSketcherActionId(a.id), sketcherRibbonIcon(a.id)]),
     '-',
     [
-      ...objectToolActions.map(a => toSketcherActionId(a.id)),
-      toSketcherActionId('Offset'),
-      toSketcherActionId('MirrorStart'),
+      ...objectToolActions.map(a => [toSketcherActionId(a.id), sketcherRibbonIcon(a.id)]),
+      [toSketcherActionId('Offset'), sketcherRibbonIcon('Offset')],
+      [toSketcherActionId('MirrorStart'), sketcherRibbonIcon('MirrorStart')],
     ],
     '-',
-    measureActions.map(a => toSketcherActionId(a.id)),
+    measureActions.map(a => [toSketcherActionId(a.id), sketcherRibbonIcon(a.id)]),
     '-',
-    //constraintGlobalActions.map(a => toSketcherActionId(a.id)),
+    //constraintGlobalActions.map(a => [toSketcherActionId(a.id), sketcherRibbonIcon(a.id)]),
     //'-',
-    ['LookAtFace'],
+    ['LookAtFace', ribbonIcon('LookAtFace')],
     '-',
-    ['sketchOpenInTab']
+    ['sketchOpenInTab', sketcherRibbonIcon('sketchOpenInTab')]
   ];
 
   insertAfter(SKETCHER_MODE_HEADS_UP_ACTIONS, SKETCHER_PREFIX + 'Export', '-');
