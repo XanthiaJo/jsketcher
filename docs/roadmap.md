@@ -45,10 +45,25 @@ Make every ribbon, toolbar, and workbench use the same icon family and sizing mo
 Improve the visual feedback when a user hovers or activates a modeling action (Extrude, Cut, Revolve, Loft, Sweep, Boolean, etc.) so the expected result is clearer before committing.
 
 - [ ] Show a live preview of the operation result in the 3D viewport while the wizard dialog is open (some operations already preview on parameter change; make this consistent across all)
+- [ ] Add pullable extrusion handles so users can drag extrusion depth directly in the viewport before committing
 - [ ] Add hover tooltips with a short description and icon for every ribbon action
 - [ ] Add visual cursor or mode indicator when a tool is active (e.g. sketch tools show the active tool state)
 - [ ] Improve wizard dialog layout with inline previews of the selected geometry and the projected result
 - [ ] Add preview-on-hover for ribbon buttons showing a small rendered example of the operation (stretch goal)
+
+---
+
+## Planned — Project Persistence
+
+- [ ] Save projects to the database so signed-in users can access their work across devices and browser sessions
+- [ ] Keep local browser storage as a fallback when database saving is unavailable
+
+---
+
+## Planned — Touchscreen and Pen Workflow
+
+- [ ] Improve native touchscreen and pen interaction for sketching, selection, viewport navigation, and command entry
+- [ ] Add touch-friendly UI affordances for common CAD workflows without compromising desktop precision
 
 ---
 
