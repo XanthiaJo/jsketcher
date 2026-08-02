@@ -8,7 +8,7 @@ import Expressions from '../expressions/Expressions';
 import {SelectionView} from "../dom/components/SelectionView";
 import {GrSelect} from "react-icons/gr";
 import {Explorer} from "cad/dom/components/Explorer";
-import {Download, Save, SunMoon} from "lucide-react";
+import {Download, Save} from "lucide-react";
 import {getSizeInPx} from "cad/icons/DeclarativeIcon";
 
 export const BundleName = "@UIConfig";
@@ -26,13 +26,13 @@ export function activate(ctx) {
     ['ShowSketches', {label: 'sketches'}],
     ['DeselectAll', {label: null}],
     ['ToggleOrbitMode', {label: null}],
-    ['ToggleCameraMode', {label: null}]
+    ['ToggleCameraMode', {label: null}],
+    ['ToggleTheme', {label: null}]
   ];
 
   streams.ui.toolbars.headsUpQuickActions.value = [
     ['Save', {label: null, ...ribbonIcon(Save)}],
     ['StlExport', {label: null, ...ribbonIcon(Download)}],
-    ['ToggleTheme', {label: null, ...ribbonIcon(SunMoon)}],
     'menu.workbenches'
   ];
   
