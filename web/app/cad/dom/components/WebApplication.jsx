@@ -7,11 +7,11 @@ import {ReactApplicationContext} from "../ReactApplicationContext";
 import {Debugger} from "debugger/Debugger";
 
 try {
-  if (localStorage.getItem('jsketcher.theme') === 'light') {
+  if (localStorage.getItem('jsketcher.theme') !== 'dark') {
     document.body.classList.add('theme-light');
   }
 } catch(e) {
-  // Default dark theme remains active when storage is unavailable.
+  document.body.classList.add('theme-light');
 }
 
 export default function WebApplication(props) {

@@ -1,0 +1,33 @@
+/* Structured Chaos family header shell for the JSketcher static entry pages. */
+
+.page-jsketcher {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.page-jsketcher .global-bar,
+.page-jsketcher .site-header {
+  flex-shrink: 0;
+}
+
+.jsketcher-app {
+  flex: 1 1 0;
+  min-height: 0;
+}
+
+.page-jsketcher-doc {
+  height: auto;
+  min-height: 100vh;
+  overflow: auto;
+}
+
+.page-jsketcher-doc .page-main {
+  padding-top: 32px;
+  padding-bottom: 48px;
+}
+
+.page-jsketcher-doc .content-main {
+  min-width: 0;
+}
