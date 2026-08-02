@@ -184,7 +184,10 @@ function cleanCommitDescription(subject, body) {
 
 const args = parseArgs(process.argv);
 const root = args.root ? resolve(args.root) : process.cwd();
-const outputPath = args.output ? resolve(args.output) : resolve(root, 'docs/changelog.md');
+const format = args.format || 'md';
+const outputPath = args.output
+  ? resolve(args.output)
+  : resolve(root, format === 'html' ? 'web/changelog-fragment.html' : 'docs/changelog.md');
 const upstreamRef = args.upstream || 'upstream/main';
 const headRef = args.head || 'HEAD';
 
@@ -322,7 +325,6 @@ const commitCount = parseInt(git(root, 'rev-list', '--count', headRef).trim(), 1
 const shortSha = git(root, 'rev-parse', '--short', headRef).trim();
 const forkCommitCount = forkCommitShas.length;
 
-// Generate markdown
 const groupLabels = {
   breaking: 'Breaking Changes',
   feature: 'Features',
@@ -337,53 +339,187 @@ const groupLabels = {
 
 const groupOrder = ['breaking', 'feature', 'fix', 'ui', 'docs', 'refactor', 'test', 'chore', 'other'];
 
-const lines = [];
-lines.push('# Changelog');
-lines.push('');
-lines.push(`> **${currentVersion}** — ${forkCommitCount} fork commits · ${commitCount} total commits · HEAD ${shortSha}`);
-lines.push('');
-lines.push('> Only commits unique to this fork are listed. Upstream history is excluded.');
-lines.push('> Generated from conventional commits using `git cherry ' + upstreamRef + ' ' + headRef + '`.');
-lines.push('');
-lines.push(`_Last generated: ${new Date().toISOString().slice(0, 10)}_`);
-lines.push('');
+const groupChipClass = {
+  breaking: 'color-pair-red',
+  feature: 'color-pair-gold',
+  fix: 'color-pair-sage',
+  ui: 'color-pair-sky',
+  docs: 'color-pair-stone',
+  refactor: 'color-pair-plum',
+  test: 'color-pair-olive',
+  chore: 'color-pair-ink',
+  other: 'color-pair-ink',
+};
 
-for (const group of groupOrder) {
-  const entries = changeGroups[group];
-  if (entries.length === 0) continue;
+let content;
+
+if (format === 'html') {
+  const esc = (s) =>
+    String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+
+  // Collect unique versions in descending order (newest first)
+  const allVersions = new Set();
+  for (const items of Object.values(changeGroups)) {
+    for (const item of items) {
+      allVersions.add(item.version);
+    }
+  }
+  const sortedVersions = [...allVersions].sort((a, b) => {
+    const pa = a.replace(/^v/, '').split('.').map(Number);
+    const pb = b.replace(/^v/, '').split('.').map(Number);
+    for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+      const va = pa[i] || 0;
+      const vb = pb[i] || 0;
+      if (va !== vb) return vb - va;
+    }
+    return 0;
+  });
+
+  const html = [];
+
+  // --- Sidebar blocks (moved into the sidebar via JS on the page) ---
+  // Change Types as a headed panel
+  html.push('<div class="changelog-types" data-version="v2">');
+  html.push('  <div class="container-section--headed">');
+  html.push('    <div class="container-section-header">Change Types</div>');
+  html.push('    <div class="container-section-body">');
+  html.push('      <nav class="container-actions" aria-label="Changelog sections">');
+  for (const groupKey of groupOrder) {
+    const items = changeGroups[groupKey];
+    if (!items || items.length === 0) continue;
+    html.push(`        <a class="chip ${groupChipClass[groupKey]}" href="#${groupKey}-changes">${groupLabels[groupKey]}</a>`);
+  }
+  html.push('      </nav>');
+  html.push('    </div>');
+  html.push('  </div>');
+  html.push('</div>');
+
+  // Versions list as a headed panel
+  html.push('<div class="changelog-versions" data-version="v2">');
+  html.push('  <div class="container-section--headed">');
+  html.push('    <div class="container-section-header">Versions</div>');
+  html.push('    <div class="container-section-body">');
+  html.push('      <ul class="list">');
+  for (const version of sortedVersions) {
+    html.push(`        <li><a href="#${esc(version)}"><span class="caption">${esc(version)}</span></a></li>`);
+  }
+  html.push('      </ul>');
+  html.push('    </div>');
+  html.push('  </div>');
+  html.push('</div>');
+
+  // --- Main content: Build Snapshot + change sections ---
+  html.push('<div class="container-sections">');
+
+  // Build snapshot panel
+  html.push('  <section class="panel panel--padded">');
+  html.push('    <h3>Build Snapshot</h3>');
+  html.push('    <div class="container-actions">');
+  html.push(`      <span class="chip ${groupChipClass.other}">Version ${esc(currentVersion)}</span>`);
+  html.push(`      <span class="chip color-pair-stone">${forkCommitCount} fork commits</span>`);
+  html.push(`      <span class="chip color-pair-stone">${commitCount} total commits</span>`);
+  html.push('    </div>');
+  html.push('  </section>');
+
+  // Each group
+  for (const groupKey of groupOrder) {
+    const items = changeGroups[groupKey];
+    if (!items || items.length === 0) continue;
+
+    html.push(`  <section class="panel panel--padded" id="${groupKey}-changes">`);
+    html.push(`    <h4>${esc(groupLabels[groupKey])}</h4>`);
+    html.push('    <ul class="list">');
+
+    // Track which versions have already been anchored so only the first
+    // entry for each version gets an id that the sidebar can link to.
+    const anchoredVersions = new Set();
+
+    for (const item of [...items].reverse()) {
+      const liId = !anchoredVersions.has(item.version) ? ` id="${esc(item.version)}"` : '';
+      if (liId) anchoredVersions.add(item.version);
+      html.push(`      <li${liId}>`);
+      html.push('        <div class="container-content">');
+      html.push('          <div class="container-actions">');
+      html.push(`          <span class="chip ${groupChipClass[groupKey]}">${esc(groupLabels[groupKey])}</span>`);
+      html.push(`            <span class="caption">${esc(item.version)} - ${esc(item.sha)} - ${esc(item.date)}</span>`);
+      html.push('          </div>');
+      html.push(`          <h5>${esc(item.subject)}</h5>`);
+      if (item.description) {
+        html.push('          <ul>');
+        if (Array.isArray(item.description)) {
+          for (const bullet of item.description) {
+            html.push(`            <li>${esc(bullet)}</li>`);
+          }
+        } else {
+          html.push(`            <li>${esc(item.description)}</li>`);
+        }
+        html.push('          </ul>');
+      }
+      html.push('        </div>');
+      html.push('      </li>');
+    }
+
+    html.push('    </ul>');
+    html.push('  </section>');
+  }
+
+  html.push('</div>');
+  content = html.join('\n');
+} else {
+  // --- Markdown format ---
+  const lines = [];
+  lines.push('# Changelog');
+  lines.push('');
+  lines.push(`> **${currentVersion}** — ${forkCommitCount} fork commits · ${commitCount} total commits · HEAD ${shortSha}`);
+  lines.push('');
+  lines.push('> Only commits unique to this fork are listed. Upstream history is excluded.');
+  lines.push('> Generated from conventional commits using `git cherry ' + upstreamRef + ' ' + headRef + '`.');
+  lines.push('');
+  lines.push(`_Last generated: ${new Date().toISOString().slice(0, 10)}_`);
+  lines.push('');
+
+  for (const group of groupOrder) {
+    const entries = changeGroups[group];
+    if (entries.length === 0) continue;
+
+    lines.push('---');
+    lines.push('');
+    lines.push(`## ${groupLabels[group]}`);
+    lines.push('');
+
+    for (const entry of entries) {
+      lines.push(`### ${entry.subject}`);
+      lines.push('');
+      lines.push(`**${entry.version}** · ${entry.sha} · ${entry.date}`);
+      lines.push('');
+      if (entry.description) {
+        if (Array.isArray(entry.description)) {
+          for (const bullet of entry.description) {
+            lines.push(`- ${bullet}`);
+          }
+        } else {
+          lines.push(entry.description);
+        }
+        lines.push('');
+      }
+    }
+  }
 
   lines.push('---');
   lines.push('');
-  lines.push(`## ${groupLabels[group]}`);
-  lines.push('');
-
-  for (const entry of entries) {
-    lines.push(`### ${entry.subject}`);
-    lines.push('');
-    lines.push(`**${entry.version}** · ${entry.sha} · ${entry.date}`);
-    lines.push('');
-    if (entry.description) {
-      if (Array.isArray(entry.description)) {
-        for (const bullet of entry.description) {
-          lines.push(`- ${bullet}`);
-        }
-      } else {
-        lines.push(entry.description);
-      }
-      lines.push('');
-    }
-  }
+  content = lines.join('\n');
 }
 
-lines.push('---');
-lines.push('');
-
-const content = lines.join('\n');
-
+// Write output
 mkdirSync(dirname(outputPath), { recursive: true });
 writeFileSync(outputPath, content, 'utf8');
 
 console.log(`Generated ${outputPath}`);
+console.log(`  Format: ${format}`);
 console.log(`  Version: ${currentVersion}`);
 console.log(`  ${forkCommitCount} fork-only commits (out of ${commitCount} total)`);
 console.log(`  Upstream ref: ${upstreamRef}`);

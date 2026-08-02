@@ -96,7 +96,8 @@ const DEPLOY_COMMANDS = [
   ['git', ['fetch', 'origin', 'main']],
   ['git', ['reset', '--hard', 'origin/main']],
   ['npm', ['ci']],
-  ['node', ['scripts/generate-changelog.mjs', '--root=.', '--output=docs/changelog.md']],
+  ['node', ['scripts/generate-changelog.mjs', '--root=.', '--format=md', '--output=docs/changelog.md']],
+  ['node', ['scripts/generate-changelog.mjs', '--root=.', '--format=html', '--output=web/changelog-fragment.html']],
   ['npx', ['grunt']],
 ];
 

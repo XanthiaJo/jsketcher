@@ -1,0 +1,320 @@
+<div class="changelog-types" data-version="v2">
+  <div class="container-section--headed">
+    <div class="container-section-header">Change Types</div>
+    <div class="container-section-body">
+      <nav class="container-actions" aria-label="Changelog sections">
+        <a class="chip color-pair-gold" href="#feature-changes">Features</a>
+        <a class="chip color-pair-sage" href="#fix-changes">Fixes</a>
+        <a class="chip color-pair-sky" href="#ui-changes">Interface</a>
+        <a class="chip color-pair-stone" href="#docs-changes">Documentation</a>
+        <a class="chip color-pair-plum" href="#refactor-changes">Refactors</a>
+        <a class="chip color-pair-ink" href="#chore-changes">Maintenance</a>
+        <a class="chip color-pair-ink" href="#other-changes">Other Changes</a>
+      </nav>
+    </div>
+  </div>
+</div>
+<div class="changelog-versions" data-version="v2">
+  <div class="container-section--headed">
+    <div class="container-section-header">Versions</div>
+    <div class="container-section-body">
+      <ul class="list">
+        <li><a href="#v0.6.0.5"><span class="caption">v0.6.0.5</span></a></li>
+        <li><a href="#v0.6.0.4"><span class="caption">v0.6.0.4</span></a></li>
+        <li><a href="#v0.6.0.3"><span class="caption">v0.6.0.3</span></a></li>
+        <li><a href="#v0.6.0.2"><span class="caption">v0.6.0.2</span></a></li>
+        <li><a href="#v0.6.0.1"><span class="caption">v0.6.0.1</span></a></li>
+        <li><a href="#v0.6.0"><span class="caption">v0.6.0</span></a></li>
+        <li><a href="#v0.5.0.2"><span class="caption">v0.5.0.2</span></a></li>
+        <li><a href="#v0.5.0.1"><span class="caption">v0.5.0.1</span></a></li>
+        <li><a href="#v0.5.0"><span class="caption">v0.5.0</span></a></li>
+        <li><a href="#v0.4.1"><span class="caption">v0.4.1</span></a></li>
+        <li><a href="#v0.4.0"><span class="caption">v0.4.0</span></a></li>
+        <li><a href="#v0.3.0.1"><span class="caption">v0.3.0.1</span></a></li>
+        <li><a href="#v0.3.0"><span class="caption">v0.3.0</span></a></li>
+        <li><a href="#v0.2.0.1"><span class="caption">v0.2.0.1</span></a></li>
+        <li><a href="#v0.2.0"><span class="caption">v0.2.0</span></a></li>
+        <li><a href="#v0.1.0.2"><span class="caption">v0.1.0.2</span></a></li>
+        <li><a href="#v0.1.0.1"><span class="caption">v0.1.0.1</span></a></li>
+        <li><a href="#v0.1.0"><span class="caption">v0.1.0</span></a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+<div class="container-sections">
+  <section class="panel panel--padded">
+    <h3>Build Snapshot</h3>
+    <div class="container-actions">
+      <span class="chip color-pair-ink">Version v0.6.0.5</span>
+      <span class="chip color-pair-stone">18 fork commits</span>
+      <span class="chip color-pair-stone">1802 total commits</span>
+    </div>
+  </section>
+  <section class="panel panel--padded" id="feature-changes">
+    <h4>Features</h4>
+    <ul class="list">
+      <li id="v0.6.0">
+        <div class="container-content">
+          <div class="container-actions">
+          <span class="chip color-pair-gold">Features</span>
+            <span class="caption">v0.6.0 - 6b91f4ce - 2026-08-02</span>
+          </div>
+          <h5>Refresh light theme and site shell</h5>
+          <ul>
+            <li>refresh light theme tokens and styles</li>
+            <li>add site-shell.css for Structured Chaos family chrome</li>
+            <li>wire View3d, WebApplication, and MenuHolder to the refreshed theme</li>
+          </ul>
+        </div>
+      </li>
+      <li id="v0.5.0">
+        <div class="container-content">
+          <div class="container-actions">
+          <span class="chip color-pair-gold">Features</span>
+            <span class="caption">v0.5.0 - b08de976 - 2026-08-02</span>
+          </div>
+          <h5>Add turntable/trackball orbit mode toggle</h5>
+          <ul>
+            <li>add OrbitMode enum and persisted orbitMode\$ state to Viewer with localStorage persistence</li>
+            <li>add toggleOrbitMode action and apply turntable/trackball rotation mode to CADTrackballControls</li>
+            <li>add orbit mode icon helper in coreActions and reflect active mode on the ToggleOrbitMode button via uiConfigBundle</li>
+            <li>add CameraControl component and cameraControlRenderer wiring for the orbit mode UI</li>
+            <li>guard zoomIn, zoomOut, lookAt, dispose, and orbit mode init against missing renderer/trackballControls so the viewer stays safe when WebGL is unavailable</li>
+          </ul>
+        </div>
+      </li>
+      <li id="v0.4.0">
+        <div class="container-content">
+          <div class="container-actions">
+          <span class="chip color-pair-gold">Features</span>
+            <span class="caption">v0.4.0 - 29d01a5a - 2026-07-27</span>
+          </div>
+          <h5>Add origin floor grid</h5>
+        </div>
+      </li>
+      <li id="v0.3.0">
+        <div class="container-content">
+          <div class="container-actions">
+          <span class="chip color-pair-gold">Features</span>
+            <span class="caption">v0.3.0 - 79fb0900 - 2026-07-27</span>
+          </div>
+          <h5>Add view cube and plane highlight grid</h5>
+        </div>
+      </li>
+      <li id="v0.2.0">
+        <div class="container-content">
+          <div class="container-actions">
+          <span class="chip color-pair-gold">Features</span>
+            <span class="caption">v0.2.0 - c7f6bcb0 - 2026-07-27</span>
+          </div>
+          <h5>Restore persisted light and dark themes</h5>
+        </div>
+      </li>
+    </ul>
+  </section>
+  <section class="panel panel--padded" id="fix-changes">
+    <h4>Fixes</h4>
+    <ul class="list">
+      <li id="v0.4.1">
+        <div class="container-content">
+          <div class="container-actions">
+          <span class="chip color-pair-sage">Fixes</span>
+            <span class="caption">v0.4.1 - de7e5485 - 2026-08-02</span>
+          </div>
+          <h5>Handle WebGL unavailable gracefully</h5>
+          <ul>
+            <li>check WebGL support in SceneSetUp before initialising renderer, controls, and animation loop</li>
+            <li>show a warning overlay with troubleshooting steps when WebGL context creation fails</li>
+            <li>guard renderer-dependent methods (render, updateClearColor, updateViewportSize, domElement) with null checks</li>
+            <li>activate DomBundle and SceneBundle first inside the startReact callback so the viewer container exists and WebGL availability can be checked before activating dependent bundles</li>
+            <li>skip WebGL-dependent bundles (MouseEventSystem, Marker, PickControl, EntityContext, ViewSync, Highlight, Assembly, Debug, Preview, UIConfig) when WebGL is not available</li>
+            <li>provide dummy highlightService, cadScene, pickControl, and modelMouseEventSystem in SceneBundle so non-WebGL bundles and React components do not crash</li>
+            <li>guard MouseEventSystemBundle against missing domElement and trackballControls</li>
+            <li>guard PickControlBundle and DomBundle tab switch against a missing renderer</li>
+            <li>guard ExportBundle image/png export against a missing renderer or cadScene</li>
+            <li>guard Viewer dispose against a missing renderer</li>
+          </ul>
+        </div>
+      </li>
+    </ul>
+  </section>
+  <section class="panel panel--padded" id="ui-changes">
+    <h4>Interface</h4>
+    <ul class="list">
+      <li id="v0.5.0.2">
+        <div class="container-content">
+          <div class="container-actions">
+          <span class="chip color-pair-sky">Interface</span>
+            <span class="caption">v0.5.0.2 - 3ed0bd1e - 2026-08-02</span>
+          </div>
+          <h5>Restyle view cube and heads-up toolbar</h5>
+          <ul>
+            <li>restyle view cube faces, home button, and hover states with a lighter palette</li>
+            <li>update ViewCube component to match the new styling</li>
+            <li>refresh heads-up toolbar layout and styles</li>
+            <li>adjust control bar and bottom stack spacing</li>
+          </ul>
+        </div>
+      </li>
+      <li id="v0.5.0.1">
+        <div class="container-content">
+          <div class="container-actions">
+          <span class="chip color-pair-sky">Interface</span>
+            <span class="caption">v0.5.0.1 - 04ca86dc - 2026-08-02</span>
+          </div>
+          <h5>Migrate action icons to lucide-react</h5>
+          <ul>
+            <li>replace react-icons and FontAwesome css icons with lucide-react footer icons in usabilityActions</li>
+            <li>add modelerRibbonIcon and sketcherRibbonIcon components</li>
+            <li>update menuConfig to use the new icon components</li>
+          </ul>
+        </div>
+      </li>
+      <li id="v0.3.0.1">
+        <div class="container-content">
+          <div class="container-actions">
+          <span class="chip color-pair-sky">Interface</span>
+            <span class="caption">v0.3.0.1 - 23ce306e - 2026-07-27</span>
+          </div>
+          <h5>Refine slate chrome and view cube controls</h5>
+        </div>
+      </li>
+      <li id="v0.2.0.1">
+        <div class="container-content">
+          <div class="container-actions">
+          <span class="chip color-pair-sky">Interface</span>
+            <span class="caption">v0.2.0.1 - a51f38a1 - 2026-07-27</span>
+          </div>
+          <h5>Replace modeler ribbon icons</h5>
+        </div>
+      </li>
+    </ul>
+  </section>
+  <section class="panel panel--padded" id="docs-changes">
+    <h4>Documentation</h4>
+    <ul class="list">
+      <li id="v0.6.0.5">
+        <div class="container-content">
+          <div class="container-actions">
+          <span class="chip color-pair-stone">Documentation</span>
+            <span class="caption">v0.6.0.5 - 15ebfdc0 - 2026-08-02</span>
+          </div>
+          <h5>Add nginx config and VPS setup scripts</h5>
+          <ul>
+            <li>add www.jsketcher.misssponto.me.uk nginx config (root dist/, /webhook proxy to 3004)</li>
+            <li>add www.auth.misssponto.me.uk nginx config (root BetterAuth, /webhook proxy to 3002, / proxy to 3000)</li>
+            <li>add setup scripts for nvm, SSH keys, and git credentials used during VPS provisioning</li>
+          </ul>
+        </div>
+      </li>
+      <li id="v0.6.0.1">
+        <div class="container-content">
+          <div class="container-actions">
+          <span class="chip color-pair-stone">Documentation</span>
+            <span class="caption">v0.6.0.1 - bcd89ccf - 2026-08-02</span>
+          </div>
+          <h5>Add architecture, roadmap, and maintainer notes</h5>
+          <ul>
+            <li>add architecture, code-style, feature-preservation, and roadmap docs</li>
+            <li>expand maintainer notes with system maps and fork-specific decisions</li>
+            <li>add changelog and roadmap html pages</li>
+            <li>update README, AGENTS, git-scopes, and docs index</li>
+          </ul>
+        </div>
+      </li>
+      <li id="v0.1.0.2">
+        <div class="container-content">
+          <div class="container-actions">
+          <span class="chip color-pair-stone">Documentation</span>
+            <span class="caption">v0.1.0.2 - 38c2e873 - 2026-07-27</span>
+          </div>
+          <h5>Move developer guide into docs</h5>
+        </div>
+      </li>
+      <li id="v0.1.0.1">
+        <div class="container-content">
+          <div class="container-actions">
+          <span class="chip color-pair-stone">Documentation</span>
+            <span class="caption">v0.1.0.1 - 0b36ded4 - 2026-07-27</span>
+          </div>
+          <h5>Add jsketcher commit scopes</h5>
+        </div>
+      </li>
+    </ul>
+  </section>
+  <section class="panel panel--padded" id="refactor-changes">
+    <h4>Refactors</h4>
+    <ul class="list">
+      <li id="v0.6.0.3">
+        <div class="container-content">
+          <div class="container-actions">
+          <span class="chip color-pair-plum">Refactors</span>
+            <span class="caption">v0.6.0.3 - 5bfcf0f6 - 2026-08-02</span>
+          </div>
+          <h5>Misc model, workbench, and craft cleanup</h5>
+          <ul>
+            <li>tidy deleteBody operation and modeler index</li>
+            <li>adjust mdatum and mopenFace model handling</li>
+            <li>update openFaceView and sketcherUIContrib</li>
+            <li>minor craftBundle and Wizard tweaks</li>
+            <li>extend projectBundle load handling</li>
+          </ul>
+        </div>
+      </li>
+    </ul>
+  </section>
+  <section class="panel panel--padded" id="chore-changes">
+    <h4>Maintenance</h4>
+    <ul class="list">
+      <li id="v0.6.0.4">
+        <div class="container-content">
+          <div class="container-actions">
+          <span class="chip color-pair-ink">Maintenance</span>
+            <span class="caption">v0.6.0.4 - b7522ef2 - 2026-08-02</span>
+          </div>
+          <h5>Add GitHub webhook server for VPS auto-deploy</h5>
+          <ul>
+            <li>add scripts/webhook-server.mjs (no-dep Node.js server, verifies HMAC-SHA256, deploys on push to main)</li>
+            <li>add ecosystem.config.cjs for PM2 (jsketcher-webhook on port 3004)</li>
+            <li>add .env.example with GITHUB_WEBHOOK_SECRET template</li>
+            <li>add .env to .gitignore</li>
+            <li>document setup, nginx config, and manual fallback in AGENTS.md</li>
+          </ul>
+        </div>
+      </li>
+      <li id="v0.6.0.2">
+        <div class="container-content">
+          <div class="container-actions">
+          <span class="chip color-pair-ink">Maintenance</span>
+            <span class="caption">v0.6.0.2 - e2ece5c9 - 2026-08-02</span>
+          </div>
+          <h5>Remove standalone sketcher entry and update config</h5>
+          <ul>
+            <li>remove standalone sketcher.html 2D entry (app index is now the 3D CAD page)</li>
+            <li>remove .vscode/launch.json</li>
+            <li>update webpack, grunt, and package config for the consolidated entry</li>
+            <li>add scripts and shared shell fallback js</li>
+            <li>update index.html shell wiring</li>
+          </ul>
+        </div>
+      </li>
+    </ul>
+  </section>
+  <section class="panel panel--padded" id="other-changes">
+    <h4>Other Changes</h4>
+    <ul class="list">
+      <li id="v0.1.0">
+        <div class="container-content">
+          <div class="container-actions">
+          <span class="chip color-pair-ink">Other Changes</span>
+            <span class="caption">v0.1.0 - fd047e3e - 2026-07-24</span>
+          </div>
+          <h5>Fix PR #219 build: implement missing functions and remove dead imports</h5>
+          <ul>
+            <li>PR #219 added imports for SketchStartBundle and DirectEditBundle but never uploaded those files, causing build failures. Removed the dead imports. Implemented the missing camera functions (fitFaceToOrthoCamera, animateSketchEntry, fitSceneToCamera, fitSceneToCameraAnimated) in usabilityActions.js and getDeflection() in craft/e0/common.js that were referenced but never defined.</li>
+          </ul>
+        </div>
+      </li>
+    </ul>
+  </section>
+</div>

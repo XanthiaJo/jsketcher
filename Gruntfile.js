@@ -102,9 +102,21 @@ module.exports = function(grunt) {
     });
   });
 
-  grunt.registerTask('default', ['clean', 'build', 'copy:resources', 'copy:lib_assets', 'gen-docs', 'mark-revision', 'show-revision']);
+  grunt.registerTask('default', ['clean', 'build', 'copy:resources', 'copy:lib_assets', 'gen-docs', 'gen-changelog', 'mark-revision', 'show-revision']);
 
   grunt.registerTask('gen-docs', ['copy:docs', 'process-markdown']);
+
+  grunt.registerTask('gen-changelog', function() {
+    const done = this.async();
+    exec('node scripts/generate-changelog.mjs --root=. --format=md --output=docs/changelog.md && node scripts/generate-changelog.mjs --root=. --format=html --output=web/changelog-fragment.html', function (err, stdout, stderr) {
+      if (stdout) grunt.log.writeln(stdout);
+      if (stderr) grunt.log.writeln(stderr);
+      if (err) {
+        grunt.log.writeln('changelog generation skipped (upstream remote not configured or no fork commits)');
+      }
+      done();
+    });
+  });
 
   grunt.registerTask('process-markdown', function() {
     const done = this.async();
