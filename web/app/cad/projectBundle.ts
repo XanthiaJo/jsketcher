@@ -14,6 +14,7 @@ import {Plane} from "geom/impl/plane";
 import CSys from "math/csys";
 import { resolveProjectNameConflict } from "cad/projectNamePolicy";
 import exportTextData from "gems/exportTextData";
+import { ensureImplicitOriginGeometry, resetCraftHistoryWithOriginGeometry } from "cad/projectLoadOriginPolicy";
 
 export const STORAGE_GLOBAL_PREFIX = 'TCAD';
 export const PROJECTS_PREFIX = `${STORAGE_GLOBAL_PREFIX}.projects.`;
@@ -60,6 +61,7 @@ export function activate(ctx: ApplicationContext) {
 export function initProjectService(ctx: ApplicationContext, id: string, hints: any) {
 
   processParams(hints, ctx);
+  ensureOriginGeometry();
 
   const sketchNamespace = id + SKETCH_SUFFIX;
   const sketchStorageNamespace = PROJECTS_PREFIX + sketchNamespace;
@@ -248,23 +250,16 @@ export function initProjectService(ctx: ApplicationContext, id: string, hints: a
     upgradeIfNeeded(data);
     loadData(data);
     loadWorkbench(data);
-    addOriginGeometryAfterPipeline();
+    ensureOriginGeometryAfterPipeline();
   }
 
-  function addOriginGeometryAfterPipeline() {
-    // Always add the origin geometry (datum + 3 base planes) after the
-    // pipeline completes. loadData() triggers craftService.reset() which
-    // runs the pipeline async. The pipeline emits on update$ when done.
-    let added = false;
+  function ensureOriginGeometry() {
+    ctx.craftService.models$.next(ensureImplicitOriginGeometry(ctx.craftService.models$.value, createOriginGeometry));
+  }
+
+  function ensureOriginGeometryAfterPipeline() {
     const detacher = ctx.craftService.update$.attach(() => {
-      if (added) return;
-      added = true;
-      const originGeometry = createOriginGeometry();
-      const currentModels = ctx.craftService.models$.value;
-      const hasOrigin = currentModels.some(m => m.id === 'D:0');
-      if (!hasOrigin) {
-        ctx.craftService.models$.next([...currentModels, ...originGeometry]);
-      }
+      ensureOriginGeometry();
       detacher();
     });
   }
@@ -291,7 +286,7 @@ export function initProjectService(ctx: ApplicationContext, id: string, hints: a
       ctx.expressionService.load(data.expressions);
     }
     if (data.history) {
-      ctx.craftService.reset(data.history);
+      resetCraftHistoryWithOriginGeometry(ctx.craftService, data.history, createOriginGeometry);
     }
 
     // @ts-ignore we deliberately don't uplift the type to the ApplicationContext in order to be able to use ProjectService in the headless mode

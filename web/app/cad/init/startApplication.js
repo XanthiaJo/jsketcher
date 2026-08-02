@@ -47,7 +47,6 @@ export default function startApplication(callback) {
 
   const preUIBundles = [
     LifecycleBundle,
-    ProjectBundle,
     StorageBundle,
     AppTabsBundle,
     ActionSystemBundle,
@@ -57,6 +56,7 @@ export default function startApplication(callback) {
     ExpressionsBundle,
     OperationBundle,
     CraftBundle,
+    ProjectBundle,
     ExtensionsBundle,
     SketcherStorageBundle,
     WizardBundle,

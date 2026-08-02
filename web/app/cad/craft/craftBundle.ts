@@ -21,6 +21,7 @@ export function activate(ctx: ApplicationContext) {
   const pipelineFailure$ = state<any>(null);
 
   let preRun = null;
+  let resetSeedModelsFactory = null;
 
   function modifyWithPreRun(request, modificationsUpdater, onAccepted, onError) {
 
@@ -48,7 +49,8 @@ export function activate(ctx: ApplicationContext) {
       request => modifications$.update(modifications => stepOverriding(modifications, request)), onAccepted, onError);
   }
 
-  function reset(modifications: OperationRequest[]) {
+  function reset(modifications: OperationRequest[], seedModelsFactory = null) {
+    resetSeedModelsFactory = seedModelsFactory;
     modifications$.next({
       history: modifications,
       pointer: modifications.length - 1
@@ -167,12 +169,15 @@ export function activate(ctx: ApplicationContext) {
 
     const prev = stream.value;
     let beginIndex;
-    if (isAdditiveChange(prev, curr)) {
+    const seedModelsFactory = resetSeedModelsFactory;
+    resetSeedModelsFactory = null;
+
+    if (!seedModelsFactory && isAdditiveChange(prev, curr)) {
       beginIndex = prev.pointer + 1;
     } else {
       MObjectIdGenerator.reset();
       beginIndex = 0;
-      models$.next([]);
+      models$.next(seedModelsFactory ? seedModelsFactory() : []);
     }
 
     const {history, pointer} = curr;
@@ -273,7 +278,7 @@ interface CraftService {
 
   modifyInHistoryAndStep(request: OperationRequest, onAccepted: () => void, onError: (error) => void);
 
-  reset(modifications: OperationRequest[]);
+  reset(modifications: OperationRequest[], seedModelsFactory?: () => MObject[]);
 
   rebuild(): void;
 
