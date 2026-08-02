@@ -403,8 +403,10 @@ Notes:
 - Full TypeScript checking may surface pre-existing errors unrelated to
   your change. Check that your changed files have no errors; don't try to
   fix unrelated pre-existing errors unless asked.
-- Webpack may warn about conflicting star exports from
-  `react-icons/all.js`; this is pre-existing.
+- Do not import from `react-icons/all`. Its star re-exports collide
+  across icon sets and trigger Webpack "conflicting star exports"
+  warnings. Import each icon from its own set subpath (e.g.
+  `react-icons/gr`, `react-icons/bi`) instead.
 - For targeted lint checks on specific files:
   ```bash
   node ./node_modules/eslint/bin/eslint.js path/to/file1 path/to/file2

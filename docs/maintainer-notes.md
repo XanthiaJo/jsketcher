@@ -261,7 +261,7 @@ Notes:
 
 - `npm run pack` currently includes `--colors`, which may fail with the installed webpack CLI. Use the direct webpack command above if that happens.
 - Full TypeScript checking may surface dependency or legacy-code issues unrelated to a UI change. Use targeted checks when working in a dirty branch, but still run the broader checks before a clean merge.
-- Webpack may warn about conflicting star exports from `react-icons/all.js`; this is pre-existing in sketcher actions.
+- Avoid importing from `react-icons/all` — its star re-exports collide across icon sets and trigger Webpack "conflicting star exports" warnings. Import each icon from its own set subpath (e.g. `react-icons/gr`, `react-icons/bi`) instead.
 
 ## Git Hygiene For This Fork
 
