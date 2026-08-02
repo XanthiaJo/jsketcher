@@ -1,17 +1,106 @@
 <html>
 <head>
-  <title>Web CAD / Part Designer</title>
+  <title>JSketcher CAD / Part Designer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Open+Sans:wght@400;600;700&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Condensed:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext">
+  <script>
+    (function () {
+      var host = location.hostname;
+      var isLocal = host === 'localhost' || host === '127.0.0.1' || host.indexOf('.ddev.site') !== -1;
+      var version = 'jsketcher-header-20260731c';
+      var liveHref = 'https://misssponto.me.uk/css/shared.css?v=' + version;
+      var localHref = 'http://localhost:4000/css/shared.css?v=' + version;
+      var link = document.createElement('link');
+      var loaded = false;
+
+      function useLiveFallback() {
+        if (loaded || !isLocal || link.href === liveHref) return;
+        link.href = liveHref;
+      }
+
+      link.rel = 'stylesheet';
+      link.href = isLocal ? localHref : liveHref;
+      link.onload = function () { loaded = true; };
+      link.onerror = useLiveFallback;
+      document.head.appendChild(link);
+
+      if (isLocal) window.setTimeout(useLiveFallback, 1200);
+    })();
+  </script>
+  <link rel="stylesheet" href="./css/site-shell.css">
   <link rel="stylesheet" href="./lib-assets/font-awesome/css/font-awesome.min.css?modeler">
   <link rel="shortcut icon" href="./img/cad/cube96.png" />
   <script src="./lib/pnltri.js"></script>
   <script src="./lib/verb.js"></script>
 </head>
-<body>
+<body class="page-jsketcher page-jsketcher-cad">
+  <script>window.SITE_HEADER = {
+    brand: 'JSketcher',
+    nav: [
+      {
+        label: 'CAD',
+        localHref: '/',
+        liveHref: 'https://jsketcher.misssponto.me.uk/'
+      },
+      {
+        label: 'Roadmap',
+        localHref: '/roadmap.html',
+        liveHref: 'https://jsketcher.misssponto.me.uk/roadmap.html'
+      },
+      {
+        label: 'Changelog',
+        localHref: '/changelog.html',
+        liveHref: 'https://jsketcher.misssponto.me.uk/changelog.html'
+      }
+    ],
+    github: 'https://github.com/Box-of-Dragons/JSketcher',
+    gitlab: 'https://gitlab.com/structured-chaos/JSketcher'
+  };</script>
+  <div id="global-bar" data-active="jsketcher"></div>
+  <script>
+    (function () {
+      var host = location.hostname;
+      var isLocal = host === 'localhost' || host === '127.0.0.1' || host.indexOf('.ddev.site') !== -1;
+      var version = 'jsketcher-header-20260731c';
+
+      function loadSharedScript(file) {
+        var loaded = false;
+        var primary = (isLocal ? 'http://localhost:4000' : 'https://misssponto.me.uk') + '/js/' + file + '?v=' + version;
+        var fallback = 'https://misssponto.me.uk/js/' + file + '?v=' + version;
+        var script = document.createElement('script');
+
+        function useLiveFallback() {
+          if (loaded || !isLocal || script.src === fallback) return;
+          var fallbackScript = document.createElement('script');
+          fallbackScript.src = fallback;
+          fallbackScript.defer = true;
+          fallbackScript.async = false;
+          document.head.appendChild(fallbackScript);
+        }
+
+        script.src = primary;
+        script.defer = true;
+        script.async = false;
+        script.onload = function () { loaded = true; };
+        script.onerror = useLiveFallback;
+        document.head.appendChild(script);
+
+        if (isLocal) window.setTimeout(useLiveFallback, 1200);
+      }
+
+      loadSharedScript('global-bar.js');
+      loadSharedScript('site-header.js');
+    })();
+  </script>
+  <script src="./js/shared-shell-fallback.js" defer></script>
+  <div id="site-header"></div>
   <a id="downloader" style="display: none;" ></a>
   <input id="uploader" style="display: none;" type="file">
-  <div id="app" style="height: 100%;"></div>
+  <div id="app" class="jsketcher-app"></div>
   <script src="./static/index.bundle.js"></script>
 </body>
 </html>

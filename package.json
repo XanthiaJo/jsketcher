@@ -1,9 +1,9 @@
 {
   "name": "jsketcher",
-  "version": "0.1.0",
+  "version": "0.4.0",
   "description": "JS.Sketcher is a parametric 2D and 3D CAD modeler written in pure javascript",
   "scripts": {
-    "start": "node ./node_modules/webpack-dev-server/bin/webpack-dev-server.js --config webpack.config.js --port 3000 --host 0.0.0.0",
+    "start": "node ./node_modules/webpack-dev-server/bin/webpack-dev-server.js --config webpack.config.js --port 3001 --host 0.0.0.0",
     "pack": "node ./node_modules/webpack/bin/webpack.js --config webpack.config.js --progress --profile --colors",
     "start-with-docs": "concurrently --kill-others 'npm start' './node_modules/grunt/bin/grunt docs-start'",
     "build": "grunt",
@@ -13,7 +13,8 @@
     "checks-passed-banner": "echo 'All conditions passed. Ready to go to the main branch. Good job!'",
     "before-main-branch-merge": "npm run lint && npm run check-code && npm run checks-passed-banner",
     "cypress": "npx cypress open",
-    "test:theme": "node test/theme.test.js"
+    "test:theme": "node test/theme.test.js",
+    "changelog": "node scripts/generate-changelog.mjs --root=. --output=docs/changelog.md"
   },
   "repository": {
     "type": "git",

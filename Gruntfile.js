@@ -85,8 +85,20 @@ module.exports = function(grunt) {
 
   grunt.registerTask('mark-revision', function() {
     const done = this.async();
-    exec('mkdir -p dist && git rev-parse HEAD > dist/.rev', function (err, stdout, stderr) {
-      done(err);
+    const fs = require('fs');
+    const path = require('path');
+
+    if (!fs.existsSync('dist')) {
+      fs.mkdirSync('dist', { recursive: true });
+    }
+
+    exec('git rev-parse HEAD', function (err, stdout, stderr) {
+      if (err) {
+        done(err);
+        return;
+      }
+      fs.writeFileSync('dist/.rev', stdout.trim());
+      done();
     });
   });
 
