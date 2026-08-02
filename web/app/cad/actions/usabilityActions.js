@@ -1,7 +1,9 @@
 import Vector, {AXIS, ORIGIN} from 'math/vector';
 import {ViewMode} from "cad/scene/viewer";
-import {GiCube, HiCube, HiOutlineCube} from "react-icons/all";
-import {RiCamera2Line} from "react-icons/ri";
+import React from 'react';
+import {Box, Cuboid, Layers, ScanEye} from 'lucide-react';
+
+const footerIcon = Icon => () => <Icon size={13} strokeWidth={2} />;
 
 const NEG_X = AXIS.X.negate();
 const NEG_Y = AXIS.Y.negate();
@@ -66,7 +68,7 @@ export default [
   {
     id: 'LookAtFace',
     appearance: {
-      icon: RiCamera2Line,
+      icon: footerIcon(ScanEye),
       info: 'move camera to show selected face',
       label: 'Look at'
     },
@@ -198,7 +200,7 @@ export default [
     id: 'ViewMode_WIREFRAME_ON',
     appearance: {
       label: 'wireframe',
-      icon: HiOutlineCube,
+      icon: footerIcon(Cuboid),
     },
     invoke: ctx => {
       ctx.services.viewer.viewMode$.next(ViewMode.WIREFRAME);
@@ -209,7 +211,7 @@ export default [
     id: 'ViewMode_SHADED_ON',
     appearance: {
       label: 'shaded',
-      icon: HiCube,
+      icon: footerIcon(Box),
     },
     invoke: ctx => {
       ctx.services.viewer.viewMode$.next(ViewMode.SHADED);
@@ -220,7 +222,7 @@ export default [
     id: 'ViewMode_SHADED_WITH_EDGES_ON',
     appearance: {
       label: 'shaded with edges',
-      icon: GiCube,
+      icon: footerIcon(Layers),
     },
     invoke: ctx => {
       ctx.services.viewer.viewMode$.next(ViewMode.SHADED_WITH_EDGES);
