@@ -15,11 +15,18 @@ export class OpenFaceShellView extends View {
     setAttribute(this.rootGroup, SHELL, this);
     setAttribute(this.rootGroup, View.MARKER, this);
   }
-  
+
+  // Hiding a plane hides only the plane surface, not the sketch drawn on it.
+  setVisible(value) {
+    if (this.openFace && this.openFace.mesh) {
+      this.openFace.mesh.visible = value;
+    }
+  }
+
   get rootGroup() {
     return this.openFace?.rootGroup
   }
-  
+
   dispose() {
     this.openFace.dispose();
   }

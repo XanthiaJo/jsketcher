@@ -33,10 +33,8 @@ export class View {
     if (!parent) {
       const attrStream = ctx.attributesService.streams.get(model.id);
       this.addDisposer(attrStream.attach(attrs => {
-        if (this.rootGroup) {
-          this.rootGroup.visible = !attrs.hidden
-          ctx.viewer.requestRender();
-        }
+        this.setVisible(!attrs.hidden);
+        ctx.viewer.requestRender();
       }));
     }
   }
@@ -59,6 +57,9 @@ export class View {
   }
 
   setVisible(value) {
+    if (this.rootGroup) {
+      this.rootGroup.visible = value;
+    }
   }
 
   mark(type = 'selection') {

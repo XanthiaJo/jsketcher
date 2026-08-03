@@ -87,12 +87,14 @@ export class SketchingView extends View {
       this.rootGroup.add(this.planeGrid);
     }
     this.planeGrid.visible = true;
+    this.ctx.cadScene.setDefaultGridSuppressed('planeHover', true);
     this.ctx.viewer.requestRender();
   }
 
   hidePlaneGrid() {
     if (this.planeGrid) {
       this.planeGrid.visible = false;
+      this.ctx.cadScene.setDefaultGridSuppressed('planeHover', false);
       this.ctx.viewer.requestRender();
     }
   }

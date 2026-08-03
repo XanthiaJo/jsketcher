@@ -4,6 +4,28 @@ const DEFAULT_GRID_SIZE = 1600;
 const DEFAULT_GRID_DIVISIONS = 64;
 const GRID_OFFSET = 0.5;
 
+// The viewer is Y-up (camera.up = (0,1,0)), so the floor is the XZ plane.
+// GridHelper already lies in the XZ plane, so no rotation is needed here.
+export function createFloorGrid(size = DEFAULT_GRID_SIZE, divisions = DEFAULT_GRID_DIVISIONS) {
+  const grid = new GridHelper(size, divisions, 0x5a8ab8, 0xb7c4cf);
+  grid.position.y = GRID_OFFSET;
+  grid.renderOrder = -1;
+
+  const materials = Array.isArray(grid.material) ? grid.material : [grid.material];
+  materials.forEach(material => {
+    material.transparent = true;
+    material.opacity = 0.32;
+    material.depthWrite = false;
+  });
+
+  grid.dispose = () => {
+    grid.geometry.dispose();
+    materials.forEach(material => material.dispose());
+  };
+
+  return grid;
+}
+
 export function createPlaneGrid(csys, size = DEFAULT_GRID_SIZE, divisions = DEFAULT_GRID_DIVISIONS) {
   const grid = new GridHelper(size, divisions, 0x5a8ab8, 0xb7c4cf);
   grid.rotation.x = Math.PI / 2;

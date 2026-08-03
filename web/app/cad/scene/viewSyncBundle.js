@@ -46,8 +46,10 @@ function sceneSynchronizer(ctx) {
       const obj = wgChildren[i];
       const shellView = getAttribute(obj, View.MARKER);
       if (shellView) {
-        const exists = cadRegistry.modelIndex.has(shellView.model.id);
-        if (!exists) {
+        const currentModel = cadRegistry.modelIndex.get(shellView.model.id);
+        // Drop the view if the model is gone or was replaced by a new instance
+        // (e.g. origin geometry recreated during project load).
+        if (!currentModel || currentModel !== shellView.model) {
           SceneGraph.removeFromGroup(cadScene.workGroup, obj);
           shellView.dispose();
         } else {

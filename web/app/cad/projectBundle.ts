@@ -26,7 +26,7 @@ export const DEFAULT_PROJECT_HISTORY: OperationRequest[] = [];
 
 // Create the origin datum and three base planes (XY, XZ, ZY) at the world origin.
 // The datum has id 'D:0' and originatingOperation = -1 (not from history).
-// The planes have { width: 100, height: 100 } bounds and originatingOperation = -1.
+// The planes have { width: 30, height: 30 } bounds (small wall-style indicators) and originatingOperation = -1.
 function createOriginGeometry() {
   const datum = new MDatum(CSys.origin());
   datum.id = 'D:0';
@@ -42,8 +42,9 @@ function createOriginGeometry() {
   for (const { name, axis } of orientations) {
     const axisVector = CSys.ORIGIN[axis];
     const plane = new Plane(axisVector, axisVector.multiply(0)._plus(CSys.ORIGIN.origin).dot(axisVector));
-    const shell = new MOpenFaceShell(new PlaneSurfacePrototype(plane), undefined, { width: 100, height: 100 });
+    const shell = new MOpenFaceShell(new PlaneSurfacePrototype(plane), undefined, { width: 30, height: 30 });
     shell.originatingOperation = -1;
+    shell.ext.isOriginPlane = true;
     planes.push(shell);
   }
 
