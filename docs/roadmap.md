@@ -2,7 +2,7 @@
 
 A high-level feature roadmap organised by area. Checked items are shipped; unchecked items are planned or in progress.
 
-_Last updated: 2026-08-02_
+_Last updated: 2026-08-03_
 
 ---
 
@@ -73,6 +73,20 @@ Improve the visual feedback when a user hovers or activates a modeling action (E
 - [ ] Add section labels to the sketcher ribbon matching the `HeadsUpToolbar` section pattern (Views, Create, Modify, Constraints, Measure)
 - [ ] Improve sketch entity selection consistency (see KnitStitch AGENTS notes on entity-based selection)
 - [ ] Add keyboard shortcuts for common sketch tools
+
+---
+
+## Planned — Z-Up Coordinate System
+
+Switch the world up-axis from Y to Z so the convention matches industry-standard CAD tools (Fusion 360, SolidWorks, Onshape, etc.) where Z is up and the ground plane is XY. The viewer is currently Y-up (`camera.up = (0,1,0)`, floor on the XZ plane).
+
+- [ ] Change the camera up vector to `(0,0,1)` and rework the default view orientation so Z is vertical
+- [ ] Move the origin/floor grid from the XZ plane to the XY plane
+- [ ] Update plane-based face highlight grids (`planeGridView`) to draw on the correct plane for the new convention
+- [ ] Audit sketch plane handling so sketches on the "ground" sit on XY rather than XZ
+- [ ] Update the view cube face labels and default camera angles for the new up-axis
+- [ ] Audit model import/export (STEP, STL, DXF) for up-axis conversion so external files still load correctly
+- [ ] Update maintainer notes and any coordinate-system references in the docs
 
 ---
 
