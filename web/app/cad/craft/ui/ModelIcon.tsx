@@ -8,6 +8,7 @@ import {GiThreePointedShuriken} from "react-icons/gi";
 import {VscDebugBreakpointLogUnverified} from "react-icons/vsc";
 import {FaVectorSquare} from "react-icons/fa";
 import {CgArrowLongRightL, CgBorderRight} from "react-icons/cg";
+import {FiEdit} from "react-icons/fi";
 
 export function ModelIcon(props: any) {
 
@@ -28,6 +29,7 @@ function getIconComp(entityType) {
     case EntityKind.VERTEX: return VscDebugBreakpointLogUnverified;
     case EntityKind.DATUM: return GiThreePointedShuriken;
     case EntityKind.DATUM_AXIS: return CgArrowLongRightL;
+    case EntityKind.SKETCH: return FiEdit;
     default: return HiOutlineCubeTransparent;
   }
 }

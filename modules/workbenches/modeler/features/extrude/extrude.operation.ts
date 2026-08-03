@@ -8,6 +8,7 @@ import {OperationDescriptor} from "cad/craft/operationBundle";
 import {MObject} from "cad/model/mobject";
 import {FaceRef} from "cad/craft/e0/OCCUtils";
 import {FromSketchProductionAnalyzer, PushPullFaceProductionAnalyzer} from "cad/craft/production/productionAnalyzer";
+import {MSketch} from "cad/model/msketch";
 
 
 interface ExtrudeParams {
@@ -44,7 +45,7 @@ export const ExtrudeOperation: OperationDescriptor<ExtrudeParams> = {
     const occ = ctx.occService;
     const oci = occ.commandInterface;
 
-    const face = params.face;
+    const face = params.face instanceof MSketch ? params.face.face : params.face;
 
     let dir: UnitVector;
     if (params.direction) {
@@ -109,7 +110,7 @@ export const ExtrudeOperation: OperationDescriptor<ExtrudeParams> = {
     {
       type: 'selection',
       name: 'face',
-      capture: [EntityKind.FACE],
+      capture: [EntityKind.FACE, EntityKind.SKETCH],
       label: 'face',
       multi: false,
       defaultValue: {

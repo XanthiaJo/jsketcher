@@ -1,7 +1,8 @@
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import {MShell} from 'cad/model/mshell';
 import {MDatum} from 'cad/model/mdatum';
 import {MOpenFaceShell} from "cad/model/mopenFace";
+import {MSketch} from "cad/model/msketch";
 import {useStream, useStreamWithPatcher} from "ui/effects";
 import {MObject} from "cad/model/mobject";
 import {SceneInlineDelineation, SceneInlineSection} from "ui/components/SceneInlineSection";
@@ -9,19 +10,37 @@ import {GenericExplorerControl, GenericExplorerNode} from "ui/components/Generic
 import ls from "cad/craft/ui/ObjectExplorer.less";
 import Fa from "ui/components/Fa";
 import {AiOutlineEye, AiOutlineEyeInvisible} from "react-icons/ai";
+import {FiEdit} from "react-icons/fi";
 import {ModelButtonBehavior} from "cad/craft/ui/ModelButtonBehaviour";
 import {ModelAttributes} from "cad/attributes/attributesService";
+import {ReactApplicationContext} from "cad/dom/ReactApplicationContext";
 
 
 export function SceneInlineObjectExplorer() {
 
   const models = useStream(ctx => ctx.craftService.models$);
+  const sketchModels = useStream(ctx => ctx.streams.sketcher.sketchModels);
 
   if (!models) {
     return null;
   }
 
-  return <SceneInlineSection title='OBJECTS'> {models.map(m => {
+  const originDatum = models.filter(m => m instanceof MDatum && m.originatingOperation === -1);
+  const originPlanes = models.filter(m => m instanceof MOpenFaceShell && m.ext.isOriginPlane);
+  const otherModels = models.filter(m =>
+    !(m instanceof MDatum && m.originatingOperation === -1) &&
+    !(m instanceof MOpenFaceShell && m.ext.isOriginPlane)
+  );
+
+  return <SceneInlineSection title='OBJECTS'>
+    {sketchModels && sketchModels.length > 0 && <Section label='Sketches' defaultOpen={false}>
+      {sketchModels.map(s => <SketchSection sketch={s} key={s.id}/>)}
+    </Section>}
+    <Section label='Origin' defaultOpen={false}>
+      {originDatum.map(m => <ModelSection model={m} key={m.id} controlVisibility/>)}
+      {originPlanes.map(m => <OpenFaceSection shell={m} key={m.id}/>)}
+    </Section>
+    {otherModels.map(m => {
     if (m instanceof MOpenFaceShell) {
       return <OpenFaceSection shell={m} key={m.id} />
     } else if (m instanceof MShell) {
@@ -99,9 +118,31 @@ export function ModelSection({model, expandable = true, controlVisibility = fals
   </ModelButtonBehavior>;
 }
 
+function SketchSection({sketch}) {
+  const ctx = useContext(ReactApplicationContext);
+  const editSketch = (e) => {
+    e.stopPropagation();
+    ctx.sketcherService.sketchFace(sketch.face);
+    return false;
+  };
+  return <ModelButtonBehavior model={sketch}>
+    {behavior => <GenericExplorerNode defaultExpanded={false}
+                                   expandable={false}
+                                   label={behavior.label}
+                                   selected={behavior.selected}
+                                   select={behavior.select}
+                                   highlighted={behavior.highlighted}
+                                   onMouseEnter={behavior.onMouseEnter}
+                                   onMouseLeave={behavior.onMouseLeave}
+                                   controls={<GenericExplorerControl onClick={editSketch} title="edit sketch">
+                                     <FiEdit />
+                                   </GenericExplorerControl>}>
+    </GenericExplorerNode>}
+  </ModelButtonBehavior>;
+}
+
 function OpenFaceSection({shell}) {
   return <ModelSection model={shell} key={shell.id} controlVisibility>
-    <SketchesList face={shell.face}/>
   </ModelSection>;
 }
 

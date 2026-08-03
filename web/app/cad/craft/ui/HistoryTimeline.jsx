@@ -12,30 +12,38 @@ import {EMPTY_OBJECT} from 'gems/objects';
 import {aboveElement} from 'ui/positionUtils';
 import {resolveAppearance} from "cad/craft/operationHelper";
 import {menuAboveElementHint} from "cad/dom/menu/menuUtils";
+import {FiEdit} from "react-icons/fi";
+import {shouldShowSketchGroup, shouldShowSeparator} from '../timelineItems';
 
-@connect(streams => combine(streams.craft.modifications, streams.operation.registry, streams.wizard.insertOperation)
-  .map(([modifications, operationRegistry, insertOperationReq]) => ({
+@connect(streams => combine(streams.craft.modifications, streams.operation.registry, streams.wizard.insertOperation, streams.sketcher.sketchModels)
+  .map(([modifications, operationRegistry, insertOperationReq, sketches]) => ({
     ...modifications,
     operationRegistry,
     inProgressOperation: !!insertOperationReq,
+    sketches,
     getOperation: type => operationRegistry[type]||EMPTY_OBJECT
   })))
 @mapContext(({streams, services}) => ({
   remove: atIndex => streams.craft.modifications.update(modifications => removeAndDropDependants(modifications, atIndex)),
   cancel: () => streams.craft.modifications.update(modifications => finishHistoryEditing(modifications)),
   setHistoryPointer: pointer => streams.craft.modifications.update(({history}) => ({history, pointer})),
-  rebuild: () => services.craft.rebuild()
+  rebuild: () => services.craft.rebuild(),
+  editSketch: sketch => services.sketcher.sketchFace(sketch.face)
 }))
 export default class HistoryTimeline extends React.Component {
 
   render() {
-    const {history, pointer, setHistoryPointer, rebuild, getOperation, inProgressOperation} = this.props;
+    const {history, pointer, setHistoryPointer, rebuild, getOperation, inProgressOperation, sketches, editSketch} = this.props;
     let scrolly;
     const eof = history.length-1;
     return <div className={cx(ls.root, ' small-typography')} ref={this.keepRef}>
       <Controls rebuild={rebuild} history={history} pointer={pointer} eoh={eof} setHistoryPointer={this.setHistoryPointerAndRequestScroll}/>
       <div className={ls.scroller} onClick={e => scrolly.scrollLeft -= 60}><Fa icon='caret-left'/></div>
       <div className={ls.history} ref={el => scrolly = el}>
+        {shouldShowSketchGroup(sketches) && <div className={ls.sketchGroup}>
+          {sketches.map((sketch) => <SketchItem key={sketch.id} sketch={sketch} onClick={() => editSketch(sketch)} />)}
+          {shouldShowSeparator(sketches, history) && <div className={ls.groupSeparator} />}
+        </div>}
         {history.map((m, i) => <React.Fragment key={i}>
           <Timesplitter active={i-1 === pointer} onClick={() => setHistoryPointer(i-1)} />
           {
@@ -153,5 +161,10 @@ const AddButton = mapContext((ctx) => ({
   }
 );
 
+function SketchItem({sketch, onClick}) {
+  return <div className={cx(ls.historyItem, ls.sketchItem)} title={'Sketch ' + sketch.sketchStorageId} onClick={onClick}>
+    <FiEdit size={16} />
+  </div>;
+}
 
  

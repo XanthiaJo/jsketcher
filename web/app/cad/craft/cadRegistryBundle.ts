@@ -1,10 +1,11 @@
 import {MShell} from '../model/mshell';
 import {MObject} from "../model/mobject";
 import {ApplicationContext} from "cad/context";
-import {Stream} from "lstream";
+import {Stream, combine} from "lstream";
 import {MFace} from "../model/mface";
 import {MEdge} from "../model/medge";
 import {MSketchObject} from "../model/msketchObject";
+import {MSketch} from "../model/msketch";
 import {MDatum, MDatumAxis} from "../model/mdatum";
 import {MLoop} from "../model/mloop";
 
@@ -13,9 +14,10 @@ export function activate(ctx: ApplicationContext) {
   const {streams, services} = ctx;
 
   const shells$: Stream<MShell> = streams.craft.models.map(models => models.filter(m => m instanceof MShell)).remember();
-  const modelIndex$ = streams.craft.models.map(models => {
+  const modelIndex$ = combine(streams.craft.models, streams.sketcher.sketchModels).map(([models, sketchModels]) => {
     const index = new Map();
     models.forEach(model => model.traverse(m => index.set(m.id, m)));
+    sketchModels.forEach(s => index.set(s.id, s));
     return index;
   }).remember();
 
@@ -65,6 +67,10 @@ export function activate(ctx: ApplicationContext) {
     return index().get(loopId);
   }
 
+  function findSketch(sketchId) {
+    return index().get(sketchId);
+  }
+
   function findEntity(entity, id) {
     return index().get(id);
   }
@@ -74,7 +80,7 @@ export function activate(ctx: ApplicationContext) {
   }
 
   services.cadRegistry = {
-    getAllShells, findShell, findFace, findEdge, findSketchObject, findEntity, findDatum, findDatumAxis, findLoop, find,
+    getAllShells, findShell, findFace, findEdge, findSketchObject, findSketch, findEntity, findDatum, findDatumAxis, findLoop, find,
     reindexFace,
     get modelIndex() {
       return streams.cadRegistry.modelIndex.value;
@@ -97,6 +103,7 @@ export interface CadRegistry {
   findFace(id: string): MFace;
   findEdge(id: string): MEdge;
   findSketchObject(id: string): MSketchObject;
+  findSketch(id: string): MSketch;
   findEntity(id: string): MObject;
   findDatum(id: string): MDatum;
   findDatumAxis(id: string): MDatumAxis;

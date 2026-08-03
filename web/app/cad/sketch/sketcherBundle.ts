@@ -7,12 +7,14 @@ import {Viewer} from "sketcher/viewer2d";
 import {IO} from "sketcher/io";
 import {Generator} from "sketcher/id-generator";
 import {MFace} from "cad/model/mface";
+import {MSketch} from "cad/model/msketch";
 
 export function defineStreams(ctx) {
   ctx.streams.sketcher = {
     update: stream(),
     sketchingFace: state(null),
-    sketcherAppContext: state(null)
+    sketcherAppContext: state(null),
+    sketchModels: state<MSketch[]>([])
   };
   ctx.streams.sketcher.sketchingMode = ctx.streams.sketcher.sketcherAppContext.map(ctx => !!ctx);
 }
@@ -111,6 +113,28 @@ export function activate(ctx) {
     }
   }
 
+  const sketchModelMap = new Map();
+
+  function syncSketchModel(mFace) {
+    const current = streams.sketcher.sketchModels.value;
+    if (mFace.sketch) {
+      let mSketch = sketchModelMap.get(mFace.id);
+      if (!mSketch) {
+        mSketch = new MSketch(mFace);
+        sketchModelMap.set(mFace.id, mSketch);
+        streams.sketcher.sketchModels.next([...current, mSketch]);
+      } else {
+        mSketch.face = mFace;
+      }
+    } else {
+      const mSketch = sketchModelMap.get(mFace.id);
+      if (mSketch) {
+        sketchModelMap.delete(mFace.id);
+        streams.sketcher.sketchModels.next(current.filter(s => s !== mSketch));
+      }
+    }
+  }
+
   ctx.craftService.models$.attach(models => models.forEach(model => model.traverse(m => {
     if (m instanceof MFace) {
       if (!m.ext.sketchInitialized) {
@@ -124,12 +148,28 @@ export function activate(ctx) {
     const sketch = ctx.sketchStorageService.readSketch(mFace.defaultSketchId);
     mFace.setSketch(sketch);
     ctx.cadRegistry.reindexFace(mFace);
+    syncSketchModel(mFace);
     streams.sketcher.update.next(mFace); // updates UI face views
   }
 
   function updateAllSketches() {
     const allShells = services.cadRegistry.getAllShells();
-    allShells.forEach(mShell => mShell.faces.forEach(mFace => updateSketchForFace(mFace)));
+    const seenFaceIds = new Set();
+    allShells.forEach(mShell => mShell.faces.forEach(mFace => {
+      seenFaceIds.add(mFace.id);
+      updateSketchForFace(mFace);
+    }));
+    const current = streams.sketcher.sketchModels.value;
+    const surviving = current.filter(s => {
+      if (seenFaceIds.has(s.face.id)) {
+        return true;
+      }
+      sketchModelMap.delete(s.face.id);
+      return false;
+    });
+    if (surviving.length !== current.length) {
+      streams.sketcher.sketchModels.next(surviving);
+    }
     services.viewer.requestRender();
   }
   

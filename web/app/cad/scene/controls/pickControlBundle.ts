@@ -1,6 +1,6 @@
 import * as mask from 'gems/mask'
 import {getAttribute} from 'scene/objectData';
-import {DATUM, DATUM_AXIS, EDGE, FACE, LOOP, SHELL, SKETCH_OBJECT} from 'cad/model/entities';
+import {DATUM, DATUM_AXIS, EDGE, FACE, LOOP, SHELL, SKETCH_OBJECT, SKETCH} from 'cad/model/entities';
 import {LOG_FLAGS} from 'cad/logFlags';
 import {initRayCastDebug, printRaycastDebugInfo, RayCastDebugInfo} from "./rayCastDebug";
 import {PickListDialog, PickListDialogRequest$} from "cad/scene/controls/PickListDialog";
@@ -39,7 +39,8 @@ export const PICK_KIND = {
   EDGE: mask.type(3),
   DATUM: mask.type(4),
   DATUM_AXIS: mask.type(5),
-  LOOP: mask.type(6)
+  LOOP: mask.type(6),
+  SKETCH_ENTITY: mask.type(7)
 };
 
 const DEFAULT_SELECTION_MODE = Object.freeze({
@@ -99,6 +100,10 @@ export function activate(context) {
       }
     } else if (type === DATUM) {
       if (dispatchSelection(DATUM, modelId, event)) {
+        return false;
+      }
+    } else if (type === SKETCH) {
+      if (dispatchSelection(SKETCH, modelId, event)) {
         return false;
       }
     }
@@ -217,7 +222,12 @@ export function activate(context) {
       setTimeout(() => domElement.addEventListener('click', clickaway, false), 100);
       return;
     }
-    traversePickResults(event, pickResults, ALL_EXCLUDING_SOLID_KINDS, pickContext.pickHandler);
+    const picked = traversePickResults(event, pickResults, ALL_EXCLUDING_SOLID_KINDS, pickContext.pickHandler);
+    // Clicking open space clears the current selection (default context only,
+    // so tools that have taken pick control keep their own selection behavior).
+    if (!picked && pickContext === defaultPickContext) {
+      services.marker.clear();
+    }
   }
 
   function pickFromRay(from3, to3, kind, event = null) {
@@ -235,16 +245,15 @@ export function activate(context) {
   
   function dispatchSelection(entityType, selectee, event) {
     const marker = services.marker;
-    if (marker.isMarked(selectee)) {
-      marker.withdraw(selectee);
-      return true;
-    }
-    const multiMode = event && event.shiftKey;
-    
+    const multiMode = event && (event.ctrlKey || event.metaKey);
     if (multiMode) {
-      marker.markAdding(entityType, selectee)
+      if (marker.isMarked(selectee)) {
+        marker.withdraw(selectee);
+      } else {
+        marker.markAdding(entityType, selectee);
+      }
     } else {
-      marker.markExclusively(entityType, selectee)
+      marker.markExclusively(entityType, selectee);
     }
     return true;
   }
@@ -326,10 +335,11 @@ export function traversePickResults(event, pickResults, kind, visitor) {
         // continue;
       }
       if (picker(pickResult)) {
-        return;
+        return true;
       }
     }
   }
+  return false;
 }
 
 function printPickInfo(model, rayCastData?) {
