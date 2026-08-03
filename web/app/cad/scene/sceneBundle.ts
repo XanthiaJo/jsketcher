@@ -36,7 +36,10 @@ export function activate(ctx: ApplicationContext) {
     // Add dummy cadScene
     services.cadScene = {
       workGroup: { children: [] },
-      auxGroup: { children: [], visible: true }
+      auxGroup: { children: [], visible: true },
+      showDefaultGrid: () => {},
+      hideDefaultGrid: () => {},
+      setDefaultGridSuppressed: () => {}
     };
     ctx.cadScene = services.cadScene;
 
@@ -64,6 +67,12 @@ export function activate(ctx: ApplicationContext) {
 
   ctx.viewer = viewer;
   ctx.cadScene = services.cadScene;
+
+  // The in-place sketcher has its own 2D grid; hide the 3D floor grid while sketching.
+  ctx.streams.sketcher.sketchingMode.attach(sketching => {
+    services.cadScene.setDefaultGridSuppressed('sketchMode', sketching);
+    viewer.requestRender();
+  });
 
   let showMenu = false;
   viewerContainer.addEventListener('mousedown', (e) => {

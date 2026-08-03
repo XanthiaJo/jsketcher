@@ -2,6 +2,7 @@ import {createArrow} from 'scene/objects/auxiliary';
 import Vector, {AXIS} from 'math/vector';
 import {OnTopOfAll} from 'scene/materialMixins';
 import {moveObject3D} from 'scene/objects/transform';
+import {createFloorGrid} from 'cad/scene/views/planeGridView';
 
 import * as SceneGraph from 'scene/sceneGraph';
 import {setCsysToViewMatrix} from 'scene/objects/transform';
@@ -12,6 +13,8 @@ export default class CadScene {
   workGroup: Object3D;
   auxGroup: Object3D;
   basisGroup: Object3D;
+  defaultGrid: Object3D;
+  defaultGridSuppressedBy: Set<string>;
 
   constructor(rootGroup) {
     this.workGroup = SceneGraph.createGroup();
@@ -22,6 +25,38 @@ export default class CadScene {
     // long XYZ axes removed — datum arrows provide sufficient reference
     // this.setUpAxises();
     this.setUpBasisGroup();
+    this.setUpDefaultGrid();
+  }
+
+  setUpDefaultGrid() {
+    this.defaultGrid = createFloorGrid();
+    this.defaultGridSuppressedBy = new Set();
+    SceneGraph.addToGroup(this.auxGroup, this.defaultGrid);
+  }
+
+  // The floor grid is hidden while suppressed for any reason (plane hover,
+  // sketch mode, ...). It becomes visible again once all reasons are cleared.
+  setDefaultGridSuppressed(reason, suppressed) {
+    if (!this.defaultGrid) {
+      return;
+    }
+    if (suppressed) {
+      this.defaultGridSuppressedBy.add(reason);
+    } else {
+      this.defaultGridSuppressedBy.delete(reason);
+    }
+    this.defaultGrid.visible = this.defaultGridSuppressedBy.size === 0;
+  }
+
+  showDefaultGrid() {
+    if (this.defaultGrid) {
+      this.defaultGridSuppressedBy.clear();
+      this.defaultGrid.visible = true;
+    }
+  }
+
+  hideDefaultGrid() {
+    this.setDefaultGridSuppressed('manual', true);
   }
 
   setUpAxises() {
