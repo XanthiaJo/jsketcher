@@ -1,5 +1,13 @@
 @import "inSceneUI-sketcher";
 
+.collapsibleTitle {
+  cursor: pointer;
+  user-select: none;
+  &:hover {
+    filter: brightness(1.2);
+  }
+}
+
 .objectItem {
   background-color: @explorer-item-bg;
   border: 1px solid @explorer-item-border;

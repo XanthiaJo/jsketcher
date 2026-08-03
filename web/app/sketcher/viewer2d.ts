@@ -56,6 +56,7 @@ export class Viewer {
   unscale: number;
   customSelectionHandler: any;
   applicationContext: any;
+  showGrid: boolean;
 
   constructor(canvas, IO, applicationContext) {
 
@@ -109,6 +110,7 @@ export class Viewer {
 
     this.translate = {x: 0.0, y: 0.0};
     this.scale = 1.0;
+    this.showGrid = true;
 
     // @ts-ignore
     this.captured = {
@@ -284,8 +286,77 @@ export class Viewer {
     this.interactiveScale = this.scale / this.retinaPxielRatio;
     this.unscale = 1 / this.interactiveScale;
 
+    if (this.showGrid) {
+      this.drawGrid(ctx);
+    }
+
     this.__drawWorkspace(ctx, this._workspace, Viewer.__SKETCH_DRAW_PIPELINE);
     this.__drawWorkspace(ctx, this._serviceWorkspace, Viewer.__SIMPLE_DRAW_PIPELINE);
+  }
+
+  drawGrid(ctx: CanvasRenderingContext2D) {
+    const cssWidth = this.canvas.width / this.retinaPxielRatio;
+    const cssHeight = this.canvas.height / this.retinaPxielRatio;
+    const tl = {x: 0, y: 0, z: 0};
+    const br = {x: 0, y: 0, z: 0};
+    this.screenToModel2(0, 0, tl);
+    this.screenToModel2(cssWidth, cssHeight, br);
+    const minX = Math.min(tl.x, br.x);
+    const maxX = Math.max(tl.x, br.x);
+    const minY = Math.min(tl.y, br.y);
+    const maxY = Math.max(tl.y, br.y);
+
+    const step = this.niceGridStep(50 / this.interactiveScale);
+    const majorStep = step * 5;
+    const lw = this.unscale; // 1px in model units
+
+    ctx.save();
+    ctx.lineWidth = lw;
+
+    // minor lines
+    ctx.beginPath();
+    const startX = Math.ceil(minX / step) * step;
+    for (let x = startX; x <= maxX; x += step) {
+      ctx.moveTo(x, minY);
+      ctx.lineTo(x, maxY);
+    }
+    const startY = Math.ceil(minY / step) * step;
+    for (let y = startY; y <= maxY; y += step) {
+      ctx.moveTo(minX, y);
+      ctx.lineTo(maxX, y);
+    }
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.12)';
+    ctx.stroke();
+
+    // major lines
+    ctx.beginPath();
+    const startMajorX = Math.ceil(minX / majorStep) * majorStep;
+    for (let x = startMajorX; x <= maxX; x += majorStep) {
+      ctx.moveTo(x, minY);
+      ctx.lineTo(x, maxY);
+    }
+    const startMajorY = Math.ceil(minY / majorStep) * majorStep;
+    for (let y = startMajorY; y <= maxY; y += majorStep) {
+      ctx.moveTo(minX, y);
+      ctx.lineTo(maxX, y);
+    }
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.22)';
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  niceGridStep(rawStep: number): number {
+    if (!isFinite(rawStep) || rawStep <= 0) {
+      return 10;
+    }
+    const pow = Math.pow(10, Math.floor(Math.log10(rawStep)));
+    const norm = rawStep / pow;
+    let nice;
+    if (norm < 1.5) nice = 1;
+    else if (norm < 3) nice = 2;
+    else if (norm < 7) nice = 5;
+    else nice = 10;
+    return nice * pow;
   }
 
   __drawWorkspace(ctx, workspace, pipeline) {

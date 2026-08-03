@@ -5,6 +5,7 @@ import {state, stream} from 'lstream';
 import {toast} from "react-toastify";
 import {ISolveStage, SolvableObject} from "./constr/solvableObject";
 import {Viewer} from "./viewer2d";
+import {addStage, removeStage} from "./stageListPolicy";
 
 export {Constraints, ParametricManager}
 
@@ -379,9 +380,30 @@ class ParametricManager {
   }
 
   newStage() {
-    this.$stages.update(s => ({
-      pointer: s.pointer + 1,
-      list: [...s.list, new SolveStage(this)]
+    this.$stages.update(s => {
+      const next = addStage({ length: s.list.length, pointer: s.pointer });
+      return {
+        pointer: next.pointer,
+        list: [...s.list, new SolveStage(this)]
+      };
+    });
+  }
+
+  removeStage(stageIndex) {
+    const s = this.$stages.value;
+    const next = removeStage({ length: s.list.length, pointer: s.pointer }, stageIndex);
+    if (!next) {
+      return; // always keep at least one stage
+    }
+    const stage = s.list[stageIndex];
+    this.viewer.historyManager.checkpoint();
+    this.startTransaction();
+    [...stage.generators].forEach(gen => this._removeGenerator(gen));
+    this._removeObjects([...stage.objects], true);
+    this.finishTransaction();
+    this.$stages.update(cur => ({
+      list: cur.list.filter((st, i) => i !== stageIndex),
+      pointer: next.pointer
     }));
   }
 

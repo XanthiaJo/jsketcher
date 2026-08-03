@@ -1,4 +1,4 @@
-import React, {useContext, useEffect} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import ls from './ConstraintExplorer.less';
 import Fa from 'ui/components/Fa';
 import {useStream} from "ui/effects";
@@ -18,6 +18,18 @@ export function ConstraintExplorer(props) {
   </React.Fragment>;
 }
 
+export function CollapsibleSection({title, defaultOpen = true, children}) {
+
+  const [open, setOpen] = useState(defaultOpen);
+
+  return <React.Fragment>
+    <div className={cx(ls.titleBar, ls.collapsibleTitle)} onClick={() => setOpen(o => !o)}>
+      <Fa fw icon={'caret-' + (open ? 'down' : 'right')}/> {title}
+    </div>
+    {open && children}
+  </React.Fragment>;
+}
+
 export function ConstraintList() {
 
   const constraints = useStream(ctx => ctx.viewer.parametricManager.$constraints);
@@ -26,8 +38,9 @@ export function ConstraintList() {
   let i = 0;
 
   return <React.Fragment>
-    <div className={ls.titleBar}>Stages</div>
-    <Scope><StageControl /></Scope>
+    <CollapsibleSection title="Stages" defaultOpen={false}>
+      <Scope><StageControl /></Scope>
+    </CollapsibleSection>
 
     {constraints.map((c) => {
       if (c.internal) {
