@@ -31,6 +31,7 @@ export class InPlaceSketcher {
     const viewer3d = this.ctx.services.viewer;
     this.face = face;
     this.face.ext.view.sketchGroup.visible = false;
+    this.savedCameraMode = viewer3d.getCameraMode();
     viewer3d.setCameraMode(CAMERA_MODE.ORTHOGRAPHIC);
     lookAtFace(this.ctx.viewer, face);
     viewer3d.render(); // updates camera projection matrix
@@ -87,6 +88,15 @@ export class InPlaceSketcher {
     this.ctx.workbenchService.switchToDefaultWorkbench();
     this.disposers.call();
     this.ctx.pickControlService.releasePickControl(this.pickControlToken);
+    if (this.savedCameraMode) {
+      viewer3d.setCameraMode(this.savedCameraMode);
+      this.savedCameraMode = null;
+    }
+    const tc = viewer3d.sceneSetup.trackballControls;
+    if (tc) {
+      tc.object.up.set(0, 1, 0);
+      tc.handleResize();
+    }
     viewer3d.requestRender();
   }
 
