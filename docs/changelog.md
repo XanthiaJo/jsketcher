@@ -1,11 +1,11 @@
 # Changelog
 
-> **v0.10.3.2** — 32 fork commits · 1816 total commits · HEAD c202709a
+> **v0.10.4.1** — 34 fork commits · 1818 total commits · HEAD 3caf5a27
 
 > Only commits unique to this fork are listed. Upstream history is excluded.
 > Generated from conventional commits using `git cherry upstream/main HEAD`.
 
-_Last generated: 2026-08-02_
+_Last generated: 2026-08-03_
 
 ---
 
@@ -108,6 +108,10 @@ _Last generated: 2026-08-02_
 
 **v0.10.3** · a09f9899 · 2026-08-02
 
+### Copy regenerated changelog into dist
+
+**v0.10.4** · a921b246 · 2026-08-02
+
 ---
 
 ## Interface
@@ -173,6 +177,16 @@ _Last generated: 2026-08-02_
 ### Add project persistence and touch workflow plans
 
 **v0.10.0.2** · e9049ef9 · 2026-08-02
+
+### Rewrite for fork, drop backer and tutorial references
+
+**v0.10.4.1** · 3caf5a27 · 2026-08-03
+
+- reframe intro as the Structured Chaos fork with production URL
+- link to fork-specific docs (architecture, code-style, roadmap, changelog)
+- remove YouTube tutorial, sample images, and live demo link
+- remove commercial licencing and OpenCollective backer section
+- mark contributing section as TBC
 
 ---
 

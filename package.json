@@ -16,6 +16,8 @@
     "test:theme": "node test/theme.test.js",
     "test:project-names": "node --experimental-default-type=module --test test/projectNamePolicy.test.mjs",
     "test:project-load-origin": "node --experimental-default-type=module --test test/projectLoadOriginPolicy.test.mjs",
+    "test:stages": "node --experimental-default-type=module --test test/stageListPolicy.test.mjs",
+    "test:timeline": "node --experimental-default-type=module --test test/timelineItems.test.mjs",
     "changelog": "node scripts/generate-changelog.mjs --root=. --format=md --output=docs/changelog.md && node scripts/generate-changelog.mjs --root=. --format=html --output=web/changelog-fragment.html"
   },
   "repository": {
