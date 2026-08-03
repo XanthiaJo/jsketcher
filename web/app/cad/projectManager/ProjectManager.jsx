@@ -18,6 +18,7 @@ import exportTextData from 'gems/exportTextData';
   clone: projectId => ctx.services.projectManager.cloneProject(projectId, true),
   rename: projectId => ctx.services.projectManager.renameProject(projectId, true),
   remove: projectId => ctx.services.projectManager.deleteProject(projectId),
+  removeRemote: uuid => ctx.remoteProjectService.remove(uuid),
 }))
 @connect(streams => streams.storage.update)
 export class ProjectManager extends React.Component {
@@ -80,6 +81,22 @@ export class ProjectManager extends React.Component {
     this.props.exportStl();
   }
 
+  deleteRemote(project) {
+    if (!project.uuid) {
+      return;
+    }
+    if (!confirm(`Delete the account project "${project.name || project.uuid}"? This cannot be undone.`)) {
+      return;
+    }
+    this.props.removeRemote(project.uuid)
+      .then(() => this.loadRemoteProjects())
+      .catch(error => {
+        console.error(error);
+        alert('Failed to delete account project. It may already be gone, or the session expired.');
+        this.loadRemoteProjects();
+      });
+  }
+
   render() {
     const {projectManager} = this.props;
     const localProjects = projectManager.listProjects();
@@ -136,6 +153,8 @@ export class ProjectManager extends React.Component {
                                          onClick={() => this.props.rename(p.id)}/>}
                         {!p.uuid && <ContextMenuItem label='Delete' icon={<Fa className={cmn.dangerColor} fw icon='remove' />}
                                          onClick={() => this.props.remove(p.id)}/>}
+                        {p.uuid && <ContextMenuItem label='Delete' icon={<Fa className={cmn.dangerColor} fw icon='remove' />}
+                                         onClick={() => this.deleteRemote(p)}/>}
                       </React.Fragment>
                     }>
                       <a href={projectHref(p)} target="_blank">

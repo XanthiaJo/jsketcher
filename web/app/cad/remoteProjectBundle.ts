@@ -63,10 +63,18 @@ export function activate(ctx: ApplicationContext) {
     });
   }
 
+  async function remove(uuid: string) {
+    return request("/jsketcher/delete", {
+      method: "POST",
+      body: JSON.stringify({ uuid }),
+    });
+  }
+
   ctx.remoteProjectService = {
     list,
     load,
     save,
+    remove,
     signInUrl,
   };
 }
@@ -77,6 +85,8 @@ export interface RemoteProjectService {
   load(uuid: string): Promise<{ data: ModelBundle } | null>;
 
   save(uuid: string, name: string, data: ModelBundle): Promise<unknown>;
+
+  remove(uuid: string): Promise<unknown>;
 
   signInUrl(): string;
 }

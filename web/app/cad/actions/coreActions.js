@@ -5,11 +5,9 @@ import {
   Copy,
   Disc,
   Download,
-  File,
   FileImage,
   FileJson,
   FilePlus2,
-  GitFork,
   Image,
   Info,
   MonitorDown,
@@ -212,26 +210,6 @@ export default [
       info: 'opens help dialog',
     },
     invoke: (context) => context.services.help.showInfo()
-  },
-
-  {
-    id: 'Donate',
-    appearance: {
-      icon: footerIcon(File),
-      label: 'donate',
-      info: 'open paypal donate page',
-    },
-    invoke: (context) => window.open('https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=WADW7V7CC32CY&lc=US&item_name=web%2dcad%2eorg&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted', '_blank')
-  },
-
-  {
-    id: 'GitHub',
-    appearance: {
-      icon: footerIcon(GitFork),
-      label: 'GitHub',
-      info: 'open GitHub project page',
-    },
-    invoke: (context) => window.open('https://github.com/xibyte/jsketcher', '_blank')
   },
 
   {
