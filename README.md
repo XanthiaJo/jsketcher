@@ -4,30 +4,16 @@ JSketcher
 
 JSketcher is a **parametric** 3D CAD modeler written in pure JavaScript.
 
-This Structured Chaos fork serves the 3D CAD app at `/`. The old standalone `sketcher.html` 2D entry has been removed from this fork.
+This is the **Structured Chaos** fork of [xibyte/jsketcher](https://github.com/xibyte/jsketcher), hosted at [jsketcher.misssponto.me.uk](https://jsketcher.misssponto.me.uk/). It serves the 3D CAD app at `/`; the old standalone `sketcher.html` 2D entry has been removed from this fork.
 
+The public pages use the shared Structured Chaos chrome (`css/shared.css`, `global-bar.js`, `site-header.js`). See [AGENTS.md](./AGENTS.md) and [docs/maintainer-notes.md](./docs/maintainer-notes.md) for fork-specific conventions and the runtime shape.
 
-<a href='https://www.youtube.com/watch?v=Vk3TTp8hNxQ&list=PLeoCiKHizvH8PZEyFvThHzVlnTF5XaL-R'> 
-  <img src='../../wiki/img/sample2d.png' width='400px'>
-  <img src='../../wiki/img/sample3d.png' width='400px'> 
-</a>
-
-[YouTube Tutorial Video](https://www.youtube.com/watch?v=Vk3TTp8hNxQ&list=PLeoCiKHizvH8PZEyFvThHzVlnTF5XaL-R)
-
-[Live Sample Demo](http://web-cad.org/?com.github.jsketcher-sample-models.MODELS.Flag-Holder)
-
-[Help Docs](./web/docs/index.md)
-
-[Workbench Dev Guide](./docs/index.md)
-
-[Maintainer Notes](./docs/maintainer-notes.md)
-
-[Commercial Licencing](https://www.autodrop3d.com/parametric-cad-beta.html)
-
-
-Please consider supporting this project by becoming a backer
-==============
-<a href="https://opencollective.com/jsketcher-ad3d/"><image src="https://opencollective.com/jsketcher-ad3d/tiers/backer.svg?avatarHeight=300&width=3000"></image><image src="https://opencollective.com/jsketcher-ad3d/tiers/badge.svg"></image></a>
+* [Workbench Dev Guide](./docs/index.md)
+* [Architecture Overview](./docs/architecture.md)
+* [Maintainer Notes](./docs/maintainer-notes.md)
+* [Code Style](./docs/code-style.md)
+* [Roadmap](./docs/roadmap.md)
+* [Changelog](./docs/changelog.md)
 
 Current Status
 ==============
@@ -86,10 +72,8 @@ Install node.js
 
 Local development runs on `http://localhost:3001`.
 
-Production is static output from `dist/`. In CloudPanel, create a static site and point the document root at `dist`; do not create a Node app for this frontend.
+Production is static output from `dist/`, produced by `npm run build` (Grunt). In CloudPanel, create a static site and point the document root at `dist`; do not create a Node app for this frontend.
 
-
-
-
-Contributing Please see  [.github/CONTRIBUTING.md ](.github/CONTRIBUTING.md )
+Contributing
 =========================
+TBC
