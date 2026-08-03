@@ -7,21 +7,33 @@ import CSys from "math/csys";
 import {EntityKind} from "cad/model/entities";
 
 
-function paramsToPlane({ orientation, datum, depth }) {
+function paramsToPlaneCSys({ orientation, datum, depth }) {
   const csys = datum ? datum.csys : CSys.ORIGIN;
 
-  let axis;
+  let x;
+  let y;
+  let z;
   if (orientation === 'XY') {
-    axis = csys.z;
+    x = csys.x.copy();
+    y = csys.y.copy();
+    z = csys.z.copy();
   } else if (orientation === 'XZ') {
-    axis = csys.y;
+    x = csys.x.copy();
+    y = csys.z.copy();
+    z = csys.y.copy();
   } else {
-    axis = csys.x;
+    x = csys.z.copy();
+    y = csys.y.copy();
+    z = csys.x.copy();
   }
 
-  const w = axis.multiply(depth)._plus(csys.origin).dot(axis);
+  const origin = csys.origin.plus(z.multiply(depth));
+  return new CSys(origin, x, y, z);
+}
 
-  return new Plane(axis, w);
+function paramsToPlane(params) {
+  const csys = paramsToPlaneCSys(params);
+  return new Plane(csys.z.asUnitVector(), csys.w());
 }
 
 
@@ -61,10 +73,11 @@ export default {
   paramsInfo: ({ depth }) => `(${depth})`,
   previewGeomProvider,
   run: (params, { cadRegistry }) => {
+    const csys = paramsToPlaneCSys(params);
 
     return {
       consumed: [],
-      created: [new MOpenFaceShell(new PlaneSurfacePrototype(paramsToPlane(params)))]
+      created: [new MOpenFaceShell(new PlaneSurfacePrototype(paramsToPlane(params)), csys)]
     }
   },
   form: [
