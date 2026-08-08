@@ -1,3 +1,4 @@
+import React from 'react';
 import {state, StateStream} from 'lstream';
 
 export function defineStreams({streams}) {
@@ -47,7 +48,7 @@ export function activate(ctx) {
   }
 }
 
-export type ActionRef = (string | string[])[];
+export type ActionRef = (string | string[] | { icon: (props: any) => React.ReactNode })[];
 
 export interface UIBundleContext {
 

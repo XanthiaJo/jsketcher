@@ -123,7 +123,7 @@ export const ModelerWorkspace: WorkbenchConfig = {
       
       ["WIRE_LINE", ribbonIcon('WIRE_LINE')],
       ['EXPORT_BREP', ribbonIcon('EXPORT_BREP')],
-    ]
+    ] as any,
   },
   icon: GiCubes
 }

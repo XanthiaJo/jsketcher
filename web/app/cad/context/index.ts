@@ -50,7 +50,10 @@ export interface ApplicationContext extends
   SketchStorageBundleContext,
   StorageBundleContext,
   WorkbenchBundleContext
-{}
+{
+  pickControl?: any;
+  modelMouseEventSystem?: any;
+}
 
 export default {} as ApplicationContext;
 

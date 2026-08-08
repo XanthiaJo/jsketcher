@@ -36,6 +36,8 @@ interface StateStream<T> extends Emitter<T> {
   update(updater: (T) => T): void;
 
   mutate(mutator: (T) => void): void;
+
+  set(value: T): void;
 }
 
 

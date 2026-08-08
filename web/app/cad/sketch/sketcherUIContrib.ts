@@ -24,22 +24,20 @@ export default function (ctx: ApplicationContext) {
     ['sketchSaveAndExit', sketcherRibbonIcon('sketchSaveAndExit')],
     ['sketchExit', sketcherRibbonIcon('sketchExit')],
     '-',
-    generalToolActions.map(a => [toSketcherActionId(a.id), sketcherRibbonIcon(a.id)]),
+    ...generalToolActions.map(a => [toSketcherActionId(a.id), sketcherRibbonIcon(a.id)]),
     '-',
-    [
-      ...objectToolActions.map(a => [toSketcherActionId(a.id), sketcherRibbonIcon(a.id)]),
-      [toSketcherActionId('Offset'), sketcherRibbonIcon('Offset')],
-      [toSketcherActionId('MirrorStart'), sketcherRibbonIcon('MirrorStart')],
-    ],
+    ...objectToolActions.map(a => [toSketcherActionId(a.id), sketcherRibbonIcon(a.id)]),
+    [toSketcherActionId('Offset'), sketcherRibbonIcon('Offset')],
+    [toSketcherActionId('MirrorStart'), sketcherRibbonIcon('MirrorStart')],
     '-',
-    measureActions.map(a => [toSketcherActionId(a.id), sketcherRibbonIcon(a.id)]),
+    ...measureActions.map(a => [toSketcherActionId(a.id), sketcherRibbonIcon(a.id)]),
     '-',
     //constraintGlobalActions.map(a => [toSketcherActionId(a.id), sketcherRibbonIcon(a.id)]),
     //'-',
     ['LookAtFace', ribbonIcon('LookAtFace')],
     '-',
     ['sketchOpenInTab', sketcherRibbonIcon('sketchOpenInTab')]
-  ];
+  ] as any;
 
   insertAfter(SKETCHER_MODE_HEADS_UP_ACTIONS, SKETCHER_PREFIX + 'Export', '-');
   insertAfter(SKETCHER_MODE_HEADS_UP_ACTIONS, SKETCHER_PREFIX + 'PanTool', '-');

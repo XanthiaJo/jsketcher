@@ -18,8 +18,8 @@ import {ReactApplicationContext} from "cad/dom/ReactApplicationContext";
 
 export function SceneInlineObjectExplorer() {
 
-  const models = useStream(ctx => ctx.craftService.models$);
-  const sketchModels = useStream(ctx => ctx.streams.sketcher.sketchModels);
+  const models = useStream(ctx => ctx.craftService.models$) as MObject[];
+  const sketchModels = useStream(ctx => ctx.streams.sketcher.sketchModels) as MSketch[];
 
   if (!models) {
     return null;
@@ -134,7 +134,7 @@ function SketchSection({sketch}) {
                                    highlighted={behavior.highlighted}
                                    onMouseEnter={behavior.onMouseEnter}
                                    onMouseLeave={behavior.onMouseLeave}
-                                   controls={<GenericExplorerControl onClick={editSketch} title="edit sketch">
+                                   controls={<GenericExplorerControl onClick={editSketch} title="edit sketch" on={false}>
                                      <FiEdit />
                                    </GenericExplorerControl>}>
     </GenericExplorerNode>}

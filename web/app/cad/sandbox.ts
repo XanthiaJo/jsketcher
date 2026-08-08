@@ -423,7 +423,7 @@ export function runSandbox(ctx: ApplicationContext) {
 
 
 
-    let oldNodes = new Set();
+    let oldNodes = new Set<any>();
 
     let delta = -5
     function simulate() {
@@ -438,13 +438,14 @@ export function runSandbox(ctx: ApplicationContext) {
 
       let curNodes = new Set();
 
-      oldNodes.forEach(n => {
+      // @ts-ignore
+      oldNodes.forEach((n: any) => {
         ctx.cadScene.auxGroup.remove(n.visual);
       });
 
       oldNodes.clear();
 
-      work.traverse((x, y, z, size, tag, node) => {
+      work.traverse((x, y, z, size, tag, node: any) => {
 
         // if (size === 1 ) {
         if (tag !== 'outside') {

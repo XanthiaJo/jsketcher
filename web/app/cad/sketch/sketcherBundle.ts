@@ -236,7 +236,7 @@ export function activate(ctx) {
 }
 
 export interface SketcherService {
-
+  sketchFace(face: any): void;
 }
 
 

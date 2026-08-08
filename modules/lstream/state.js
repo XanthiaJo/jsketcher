@@ -29,6 +29,10 @@ export class StateStream extends Emitter {
     this.next(this._value);
   }
 
+  set(v) {
+    this.next(v);
+  }
+
   attach(observer) {
     callObserver(observer, this._value);
     return super.attach(observer);

@@ -6,6 +6,7 @@ export class Node {
     this.nodes = null;
     this.tag = 0;
     this.normal = null;
+    this.visual = null;
   }
 
 
