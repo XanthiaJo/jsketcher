@@ -2,9 +2,19 @@ JSketcher
 ===========
 ![JSketcher Logo](./web/img/JSketcher-logo.svg)
 
-JSketcher is a **parametric** 3D CAD modeler written in pure JavaScript.
+A fork of [xibyte/jsketcher](https://github.com/xibyte/jsketcher) that I'm working on as a personal challenge. The original project appears to no longer be actively maintained, so I'm experimenting with UI and workflow improvements to see what I can achieve.
 
-This is the **Structured Chaos** fork of [xibyte/jsketcher](https://github.com/xibyte/jsketcher), hosted at [jsketcher.misssponto.me.uk](https://jsketcher.misssponto.me.uk/). It serves the 3D CAD app at `/`; the old standalone `sketcher.html` 2D entry has been removed from this fork.
+**Expect changes, breaks, and eventual fixes.** This is a personal project that happens to be open source. I'm building this for myself and sharing it publicly. Things will break, APIs will change, and features will appear and disappear as I figure out what works.
+
+---
+
+## What It Is
+
+JSketcher is a **parametric** 3D CAD modeler written in pure JavaScript. It uses a 2D constraint solver for sketches and the feature/history metaphor to build models. The constraint solver is completely written in JavaScript/TypeScript and powers the 3D CAD workflow, with OpenCascade handling solid modeling operations.
+
+**Hosted at:** [jsketcher.misssponto.me.uk](https://jsketcher.misssponto.me.uk/)
+
+This fork serves the 3D CAD app at `/`; the old standalone `sketcher.html` 2D entry has been removed to focus on the core 3D experience.
 
 The public pages use the shared Structured Chaos chrome (`css/shared.css`, `global-bar.js`, `site-header.js`). See [AGENTS.md](./AGENTS.md) and [docs/maintainer-notes.md](./docs/maintainer-notes.md) for fork-specific conventions and the runtime shape.
 
@@ -15,30 +25,31 @@ The public pages use the shared Structured Chaos chrome (`css/shared.css`, `glob
 * [Roadmap](./docs/roadmap.md)
 * [Changelog](./docs/changelog.md)
 
-Current Status
-==============
+---
 
-JSketcher is a parametric 3d modeler employing a 2D constraint solver for sketches and the feature/history metaphor to build models. The 2D constraint solver is completely written in javascript/typescript and is used inside the 3D CAD workflow. Originally developed by xibyte to make models for 3d printing. Today JSketcher provides a rich set of tools for visualizing, selecting/interacting with 3D geometry, tracking and storing model history all built on the foundation of the sketch constraint engine and employing OpenCascade for solid modeling operations. 
+## Current Focus
 
-Major Components and features
-==============
-* Geometric Constraint Solver. This is a most crucial component which allows to solve a system of geometric constraints applied to a sketch. 
-  See below the list of supported constraints.
-* Sketch constraint tools for designing 2d profiles inside the 3D CAD workflow.      
-* 3D Boolean engine. OpenCascade is used to perform booleans on BREP objects.
-* Feature History. Accumulates features builds a 3d model step by step. A compare step is employed to propagate edge/face IDs forward to provide a stable and robust model. 
-* Export to **STL**, **DWG** and **SVG** formats
-* Saving projects in the browser locale storage
-* Repository of dimensions. For example if there is a line length constraint applied, it's not necessary to hardcode some length value. 
-  A dimension with a symbolic name can be created and the constraint can refer to that dimension by name. 
-  Once value of dimension gets changed the sketch is resolved again accordingly to the new dimension values.  
-* 2D measurement tool. Allows adding dimensions on a 2D drawing(Linear, Vertical, Horizontal and Arc/Circle dimension are supported)
-* No any server-side needed. Only client side Javascript and wasm. 
+I'm working on making the UI more intuitive and consistent:
 
-This modeler is already used for:
+- **Modern icon system** — Replaced custom SVGs with `lucide-react` icons for a cleaner, more consistent look
+- **Better visual feedback** — View cube, plane highlight grids, and improved theme support
+- **Touch and pen support** — Making the tools work better on tablets and pen input devices
+- **Action previews** — Live previews of operations before you commit them
+- **Local-first persistence** — Projects saved locally in browser storage (with plans for optional cloud sync)
 
-* Designing of 3d models to get them 3d-printed. 3D models are based on parametric 2d sketches. All models can be exported as an STL file and 3d-printed after.     
-* Creating of 2d parametric sketches which could be exported to DWG or SVG format.   
+See the [Roadmap](./docs/roadmap.md) for what's planned and what's shipped. 
+
+## Core Features
+
+- **Geometric Constraint Solver** — Solves systems of geometric constraints applied to sketches (see supported constraints below)
+- **Sketch constraint tools** — Design 2D profiles inside the 3D CAD workflow
+- **3D Boolean engine** — OpenCascade performs booleans on BREP objects
+- **Feature History** — Builds 3D models step-by-step with stable edge/face ID propagation
+- **Export formats** — STL, DWG, and SVG
+- **Local project storage** — Save projects in browser localStorage (no cloud required)
+- **Dimension repository** — Named dimensions that can be referenced across constraints and updated globally
+- **2D measurement tools** — Linear, vertical, horizontal, and arc/circle dimensions
+- **Client-side only** — No server needed, just JavaScript and WebAssembly   
 
 Supported Constraints
 =====================
@@ -61,19 +72,38 @@ Supported Constraints
 * Lock Convexity
 * Fillet Meta Constraint
 
-Get Started With the Code
-=========================
+## Get Started With the Code
 
-Install node.js
+```bash
+# Install node.js if you don't have it
 
-* $ cd \<jsketcher folder\>
-* $ npm install
-* $ npm start
+cd <jsketcher folder>
+npm install
+npm start
+```
 
 Local development runs on `http://localhost:3001`.
 
-Production is static output from `dist/`, produced by `npm run build` (Grunt). In CloudPanel, create a static site and point the document root at `dist`; do not create a Node app for this frontend.
+Production is static output from `dist/`, produced by `npm run build` (Grunt). The deployed version is served as static files — no Node app process needed.
 
-Contributing
-=========================
-TBC
+---
+
+## Contributing
+
+Contributions are welcome! Just keep in mind that this is a personal project and the codebase will change frequently as I experiment with different approaches.
+
+**Requirements:**
+- All commits must follow [Conventional Commits](https://www.conventionalcommits.org/) format
+- See the git scopes reference in the project docs for area-specific conventions
+
+If you want to contribute, feel free to open an issue or submit a pull request. I'll do my best to review and merge things that align with the project direction.
+
+---
+
+## AI-Assisted Development
+
+This project uses AI-assisted coding tools including:
+- **Devin** (Cognition's AI coding assistant)
+- **Codex** (OpenAI's code generation model)
+
+These tools help with code generation, debugging, and exploring the codebase more efficiently. All AI-assisted code is reviewed and tested before being committed.
